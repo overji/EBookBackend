@@ -1,5 +1,7 @@
 package com.overji.ebookbackend.ControlLayer;
 
+import com.overji.ebookbackend.DataAccessLayer.UserRepository;
+import com.overji.ebookbackend.EntityLayer.User;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,10 +17,9 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-
     private final AuthenticationManager authenticationManager;
 
-    public AuthController(AuthenticationManager authenticationManager) {
+    public AuthController(UserRepository userRepository, AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
 
@@ -35,7 +36,7 @@ public class AuthController {
             Cookie cookie = new Cookie("username", username);
             cookie.setHttpOnly(true); // 设置 HttpOnly 属性
             cookie.setPath("/"); // 设置 Cookie 的作用路径
-            cookie.setMaxAge(60 * 60); // 设置 Cookie 的过期时间（1h）
+            cookie.setMaxAge(7 * 24 * 60 * 60); // 设置 Cookie 的过期时间（7days）
             response.addCookie(cookie); // 将 Cookie 添加到响应中
 
             return Map.of(
@@ -65,27 +66,6 @@ public class AuthController {
                 "message", "ok",
                 "ok", true,
                 "data", Map.of()
-        );
-    }
-
-    @GetMapping("/test")
-    public Map<String,Object> status(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if(cookies != null){
-            for(Cookie cookie:cookies){
-                if(Objects.equals(cookie.getName(), "username")){
-                    return Map.of(
-                            "status",200,
-                            "loggedin",true,
-                            "username",cookie.getValue()
-                    );
-                }
-            }
-        }
-        return Map.of(
-                "status",200,
-                "loggedin",false,
-                "username",""
         );
     }
 }

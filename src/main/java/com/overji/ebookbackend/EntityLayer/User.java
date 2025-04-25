@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "users")
@@ -12,8 +14,14 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
+
+    @Column(nullable = false)
+    private String nickname;
+
+    @Column(nullable = false)
+    private Long balance;
 
     @Column(nullable = false)
     private String password;
@@ -32,6 +40,9 @@ public class User {
     @CreationTimestamp
     @Column(nullable = false)
     private Timestamp createdAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserAddress> userAddresses;
 
     public void setId(Long id) {
         this.id = id;
@@ -87,5 +98,42 @@ public class User {
 
     public String getAvatar() {
         return avatar;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setBalance(Long balance) {
+        this.balance = balance;
+    }
+
+    public Long getBalance() {
+        return balance;
+    }
+
+    public List<UserAddress> getUserAddresses() {
+        return userAddresses;
+    }
+
+    public void setUserAddresses(List<UserAddress> userAddresses) {
+        this.userAddresses = userAddresses;
+    }
+
+    public Map<String,Object> toMap(){
+        return Map.of(
+                "id", id,
+                "username", username,
+                "nickname", nickname,
+                "balance", balance,
+                "email", email,
+                "introduction", introduction,
+                "avatar", avatar,
+                "createdAt", createdAt
+        );
     }
 }

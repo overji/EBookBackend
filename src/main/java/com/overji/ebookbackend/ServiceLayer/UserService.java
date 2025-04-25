@@ -46,4 +46,53 @@ public class UserService {
         }
         return null;
     }
+
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public void updatePasswordByUsername(String username, String password) {
+        if(username == null) {
+            throw new IllegalArgumentException("Unlogged in!");
+        }
+        if(password == null){
+            throw new IllegalArgumentException("New Password cannot be null");
+        }
+        try {
+            userRepository.updatePasswordByUsername(username, passwordEncoder.encode(password));
+        } catch (Exception e) {
+            // 捕获异常并抛出自定义异常
+            throw new RuntimeException("Failed to update password: " + e.getMessage(), e);
+        }
+    }
+
+    public void updateIntroductionByUsername(String username,String introduction){
+        if(username == null) {
+            throw new IllegalArgumentException("Unlogged in!");
+        }
+        if(introduction == null){
+            throw new IllegalArgumentException("New Introduction cannot be null");
+        }
+        try {
+            userRepository.updateIntroductionByUsername(username, introduction);
+        } catch (Exception e) {
+            // 捕获异常并抛出自定义异常
+            throw new RuntimeException("Failed to update introduction: " + e.getMessage(), e);
+        }
+    }
+
+    public void updateAvatarByUsername(String username,String avatarPath){
+        if(username == null) {
+            throw new IllegalArgumentException("Unlogged in!");
+        }
+        if(avatarPath == null){
+            throw new IllegalArgumentException("New Avatar cannot be null");
+        }
+        try {
+            userRepository.updateAvatarByUsername(username, avatarPath);
+        } catch (Exception e) {
+            // 捕获异常并抛出自定义异常
+            throw new RuntimeException("Failed to update avatar: " + e.getMessage(), e);
+        }
+    }
 }
