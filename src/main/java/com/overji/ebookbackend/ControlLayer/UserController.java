@@ -150,7 +150,7 @@ public class UserController {
         }
 
         // 保存文件到本地
-        String savePath = "uploads/";
+        String savePath = "avatars/";
         String filename = System.currentTimeMillis() + fileExtension; // 使用当前时间戳作为文件名
         File directory = new File(savePath);
         if (!directory.exists()) {
@@ -208,9 +208,9 @@ public class UserController {
         String username = UserContext.getCurrentUsername(request);
         String address = requestData.get("address");
         String phone = requestData.get("tel");
-        String reciver = requestData.get("receiver");
+        String receiver = requestData.get("receiver");
         try {
-            this.userAddressService.saveUserAddress(username, address, phone, reciver);
+            this.userAddressService.saveUserAddress(username, address, phone, receiver);
             return Map.of(
                     "message", "Address added successfully",
                     "ok", true,

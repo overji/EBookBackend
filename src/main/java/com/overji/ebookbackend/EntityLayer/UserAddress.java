@@ -18,12 +18,15 @@ public class UserAddress {
     @Column(nullable = false)
     private Long userAddrId;
 
+    @Lob
     @Column(nullable = false)
     private String address;
 
+    @Lob
     @Column(nullable = false)
     private String phone;
 
+    @Lob
     @Column(nullable = false)
     private String receiver;
 

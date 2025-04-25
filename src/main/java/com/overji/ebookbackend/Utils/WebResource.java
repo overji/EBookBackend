@@ -10,7 +10,7 @@ public class WebResource implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // 将本地文件夹 uploads 映射到 /uploads/** 路径
-        registry.addResourceHandler("uploads/**")
-                .addResourceLocations("file:uploads/");
+        registry.addResourceHandler("avatars/**")
+                .addResourceLocations("file:avatars/");
     }
 }
