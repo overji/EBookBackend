@@ -2,9 +2,12 @@ package com.overji.ebookbackend.Utils;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 public class UserContext {
@@ -18,5 +21,10 @@ public class UserContext {
             }
         }
         return "";
+    }
+
+    static public Map<String, Object> unAuthorizedError(HttpServletResponse response) {
+        response.setStatus(403);
+        return Map.of("status", 401, "message", "Unauthorized", "ok", false);
     }
 }

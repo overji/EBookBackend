@@ -11,6 +11,9 @@ public class BookTag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private Long bookTagId;
+
     @Column
     @Lob
     private String name;
@@ -39,13 +42,21 @@ public class BookTag {
         this.book = book;
     }
 
+    public void setBookTagId(Long bookTagId) {
+        this.bookTagId = bookTagId;
+    }
+
+    public Long getBookTagId() {
+        return bookTagId;
+    }
+
     public Book getBook() {
         return book;
     }
 
     public Map<String, Object> toMap() {
         return Map.of(
-                "id", id,
+                "id", bookTagId,
                 "name", name
         );
     }

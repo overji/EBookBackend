@@ -2,6 +2,7 @@ package com.overji.ebookbackend.EntityLayer;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ public class Book {
     private String author;
 
     @Lob
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column
@@ -35,7 +36,7 @@ public class Book {
     private Long sales;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BookTag> tags;
+    private List<BookTag> tags = new ArrayList<>();
 
     public void setId(Long id) {
         this.id = id;
