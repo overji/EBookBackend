@@ -6,8 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class EBookBackendApplication {
+    private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(EBookBackendApplication.class);
     public EBookBackendApplication() {
-        System.out.println("Start!");
+        logger.info("EBookBackendApplication started");
     }
 
     public static void main(String[] args) {

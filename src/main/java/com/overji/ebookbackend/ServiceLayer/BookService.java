@@ -4,6 +4,8 @@ import com.overji.ebookbackend.DataAccessLayer.BookRepository;
 import com.overji.ebookbackend.DataAccessLayer.BookTagsRepository;
 import com.overji.ebookbackend.EntityLayer.Book;
 import com.overji.ebookbackend.EntityLayer.BookTag;
+import com.overji.ebookbackend.EntityLayer.Comment;
+import com.overji.ebookbackend.EntityLayer.User;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import com.overji.ebookbackend.Utils.UserContext;
@@ -19,18 +21,18 @@ public class BookService {
     private final BookRepository bookRepository;
     private final BookTagsRepository bookTagsRepository;
 
-    public BookService(BookRepository bookRepository,BookTagsRepository bookTagsRepository) {
+    public BookService(BookRepository bookRepository, BookTagsRepository bookTagsRepository) {
         this.bookRepository = bookRepository;
         this.bookTagsRepository = bookTagsRepository;
     }
 
-    public Map<String,Object> getBooks(String tag, String keyword, int pageIndex, int pageSize) {
+    public Map<String, Object> getBooks(String tag, String keyword, int pageIndex, int pageSize) {
         List<Book> books = new ArrayList<>();
-        if(Objects.equals(tag, "") && Objects.equals(keyword, "")){
+        if (Objects.equals(tag, "") && Objects.equals(keyword, "")) {
             books = bookRepository.findAll();
-        } else if(!Objects.equals(tag, "") && Objects.equals(keyword, "")){
+        } else if (!Objects.equals(tag, "") && Objects.equals(keyword, "")) {
             books = bookRepository.findByTagContaining(tag);
-        } else if(Objects.equals(tag, "")){
+        } else if (Objects.equals(tag, "")) {
             books = bookRepository.findByTitleContaining(keyword);
         } else {
             books = bookRepository.findAllByTagAndTitle(tag, keyword);
@@ -59,10 +61,10 @@ public class BookService {
     public void insertBook(String title,
                            String author,
                            String description,
-                            Long price,
-                            String cover,
-                            List<String> tags
-                           ) {
+                           Long price,
+                           String cover,
+                           List<String> tags
+    ) {
         Book book = new Book();
         book.setTitle(title);
         book.setAuthor(author);
@@ -90,11 +92,11 @@ public class BookService {
         bookRepository.save(book);
     }
 
-    public List<String> getAllTags(){
+    public List<String> getAllTags() {
         List<BookTag> tags = bookTagsRepository.findAll();
         return tags.stream().map(
-                BookTag::getName
-        )
+                        BookTag::getName
+                )
                 .distinct()
                 .toList();
     }
@@ -104,5 +106,45 @@ public class BookService {
         return books.stream().map(
                 Book::toMap
         ).toList();
+    }
+
+    public Map<String, Object> getBookComments(Long bookId, String orderBy, int pageIndex, int pageSize, User user) {
+        List<Map<String, Object>> comments;
+        if (Objects.equals(orderBy, "likes")) {
+            List<Comment> commentList = bookRepository.getBookCommentsByLikes(bookId);
+            comments = commentList.stream().map(
+                    comment -> comment.toMap(user)
+            ).toList();
+        } else {
+            List<Comment> commentList = bookRepository.getBookCommentsByLikes(bookId);
+            comments = commentList.stream().map(
+                    comment -> comment.toMap(user)
+            ).toList();
+        }
+        int totalComments = comments.size();
+        int start = pageIndex * pageSize;
+        int end = Math.min(start + pageSize, totalComments);
+        List<Map<String, Object>> paginatedComments = comments.subList(start, end);
+        int totalPages = (int) Math.ceil((double) totalComments / pageSize);
+        return Map.of(
+                "total", totalPages,
+                "items", paginatedComments
+        );
+    }
+
+    public Map<String,Object> postBookComments(Long bookId, String content,User user) {
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
+        Comment comment = new Comment();
+        comment.setBook(book);
+        comment.setUser(user);
+        comment.setContent(content);
+        book.addComment(comment);
+        bookRepository.save(book);
+        return Map.of(
+                "message", "Comment posted successfully",
+                "ok", true,
+                "data",Map.of()
+        );
+
     }
 }

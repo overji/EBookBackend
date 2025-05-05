@@ -36,6 +36,9 @@ public class Book {
     private Long sales;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookTag> tags = new ArrayList<>();
 
     public void setId(Long id) {
@@ -136,5 +139,27 @@ public class Book {
                 "sales", sales,
                 "tags", tags.stream().map(BookTag::toMap).toList()
         );
+    }
+
+    public Long getCommentId() {
+        return (long) this.comments.size();
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
+        comment.setBook(this);
+    }
+
+    public void removeComment(Comment comment) {
+        comments.remove(comment);
+        comment.setBook(null);
     }
 }
