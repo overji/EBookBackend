@@ -2,22 +2,21 @@ package com.overji.ebookbackend.EntityLayer;
 
 import jakarta.persistence.*;
 
+import java.util.Map;
+
 @Entity
-@Table(name="cart")
-public class Cart {
+@Table(name="orderItem")
+public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long userCartId;
+    @ManyToOne
+    @JoinColumn(name = "order_in_id", nullable = false)
+    private Order order;
 
     @ManyToOne
-    @JoinColumn(name = "user_id",nullable = false)
-    private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "book_id",nullable = false)
+    @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
     @Column(nullable = false)
@@ -31,20 +30,12 @@ public class Cart {
         return id;
     }
 
-    public void setUserCartId(Long userCartId) {
-        this.userCartId = userCartId;
+    public void setOrder(Order order) {
+        this.order = order;
     }
 
-    public Long getUserCartId() {
-        return userCartId;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public User getUser() {
-        return user;
+    public Order getOrder() {
+        return order;
     }
 
     public void setBook(Book book) {
@@ -61,5 +52,13 @@ public class Cart {
 
     public Long getNumber() {
         return number;
+    }
+
+    public Map<String, Object> toMap() {
+        return Map.of(
+                "id", id,
+                "book", book.toMap(),
+                "number", number
+        );
     }
 }
