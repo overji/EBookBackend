@@ -5,6 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +48,9 @@ public class User {
 
     @ManyToMany(mappedBy = "likedUsers")
     private List<Comment> likedComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Cart> cartItems = new ArrayList<>();
 
     public void setId(Long id) {
         this.id = id;
@@ -139,5 +143,18 @@ public class User {
                 "avatar", avatar,
                 "createdAt", createdAt
         );
+    }
+
+    public Long getCartId(){
+        List<Boolean> cartIds = new ArrayList<>(Collections.nCopies(this.cartItems.size() + 1, false));
+        for (Cart cart : this.cartItems) {
+            cartIds.set(cart.getUserCartId().intValue(), true);
+        }
+        for (int i = 0; i < cartIds.size(); i++) {
+            if (!cartIds.get(i)) {
+                return (long) i;
+            }
+        }
+        return -1L;
     }
 }
