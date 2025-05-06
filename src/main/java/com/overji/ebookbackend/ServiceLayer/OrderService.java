@@ -24,6 +24,19 @@ public class OrderService {
     }
 
     public Map<String,Object> addOrder(String address, String tel, String receiver, List<Long> itemIds, User user) {
+        Long totalMoney = 0L;
+        for (Long itemId : itemIds) {
+            Cart cart = cartRepository.findByUserIdAndUserCartId(user.getId(),itemId);
+            Book book = bookRepository.findById(cart.getBook().getId()).orElseThrow(() -> new RuntimeException("Book not found"));
+            totalMoney += book.getPrice() * cart.getNumber();
+        }
+        if (totalMoney > user.getBalance()) {
+            return Map.of(
+                    "message", "余额不足",
+                    "ok", false,
+                    "data", Map.of()
+            );
+        }
         Order order = new Order();
         order.setUser(user);
         order.setAddress(address);
@@ -40,11 +53,12 @@ public class OrderService {
             orderItem.setOrder(order);
             order.addItem(orderItem);
             orderItemRepository.save(orderItem);
+            book.setSales(book.getSales() + cart.getNumber());
+            bookRepository.save(book);
         }
         this.orderRepository.save(order);
-        for (Long itemId : itemIds) {
-            cartRepository.deleteByUserCartIdAndUserId(itemId, user.getId());
-        }
+        user.setBalance(user.getBalance() - totalMoney);
+        userRepository.save(user);
         return Map.of(
                 "message", "Order placed successfully",
                 "ok", true,
@@ -55,5 +69,42 @@ public class OrderService {
     public List<Map<String,Object>> getOrdersByUserId(Long userId) {
         List<Order> orders = orderRepository.findByUserId(userId);
         return orders.stream().map(Order::toMap).toList();
+    }
+
+    public Map<String,Object> addOneOrder(String address, String tel, String receiver, Long bookId, Long number,User user){
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
+        Long totalMoney = book.getPrice() * number;
+        System.out.println("totalMoney = " + totalMoney);
+        System.out.println("user.getBalance() = " + user.getBalance());
+        if (totalMoney > user.getBalance()) {
+            return Map.of(
+                    "message", "余额不足",
+                    "ok", false,
+                    "data", Map.of()
+            );
+        }
+        Order order = new Order();
+        order.setUser(user);
+        order.setAddress(address);
+        order.setTel(tel);
+        order.setReceiver(receiver);
+        order.setUserOrderId(user.getOrderId());
+        orderRepository.save(order);
+        OrderItem orderItem = new OrderItem();
+        orderItem.setBook(book);
+        orderItem.setNumber(number);
+        orderItem.setOrder(order);
+        order.addItem(orderItem);
+        orderItemRepository.save(orderItem);
+        book.setSales(book.getSales() + number);
+        bookRepository.save(book);
+        this.orderRepository.save(order);
+        user.setBalance(user.getBalance() - totalMoney);
+        userRepository.save(user);
+        return Map.of(
+                "message", "Order placed successfully",
+                "ok", true,
+                "data",Map.of()
+        );
     }
 }

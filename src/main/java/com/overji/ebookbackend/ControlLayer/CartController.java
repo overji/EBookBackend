@@ -7,6 +7,7 @@ import com.overji.ebookbackend.ServiceLayer.UserService;
 import com.overji.ebookbackend.Utils.UserContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.websocket.server.PathParam;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,15 +28,15 @@ public class CartController {
     public Object getCartItems(
             HttpServletRequest request,
             HttpServletResponse response
-    ){
-        if(UserContext.getCurrentUsername(request).isEmpty()){
+    ) {
+        if (UserContext.getCurrentUsername(request).isEmpty()) {
             return UserContext.unAuthorizedError(response);
         }
-        try{
+        try {
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);
             return cartService.getCartItems(user);
-        } catch (Exception e){
+        } catch (Exception e) {
             response.setStatus(400);
             return Map.of(
                     "ok", false,
@@ -46,20 +47,20 @@ public class CartController {
     }
 
     @PutMapping("")
-    public Map<String,Object> addToCart(
-            @RequestBody Map<String,Object> body,
+    public Map<String, Object> addToCart(
+            @PathParam("bookId") Long bookId,
+            @PathParam("number") Long number,
             HttpServletRequest request,
             HttpServletResponse response
-    ){
-        if(UserContext.getCurrentUsername(request).isEmpty()){
+    ) {
+        if (UserContext.getCurrentUsername(request).isEmpty()) {
             return UserContext.unAuthorizedError(response);
         }
-        try{
+        try {
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);
-            Long bookId = Long.valueOf(body.get("bookId").toString());
-            return cartService.addToCart(bookId, user);
-        } catch (Exception e){
+            return cartService.addToCart(bookId, user, number);
+        } catch (Exception e) {
             response.setStatus(400);
             return Map.of(
                     "ok", false,
@@ -70,21 +71,20 @@ public class CartController {
     }
 
     @PutMapping("/{id}")
-    public Map<String,Object> updateCart(
+    public Map<String, Object> updateCart(
             @PathVariable Long id,
-            @RequestBody Map<String,Object> body,
+            @PathParam("number") Long number,
             HttpServletRequest request,
             HttpServletResponse response
-    ){
-        if(UserContext.getCurrentUsername(request).isEmpty()){
+    ) {
+        if (UserContext.getCurrentUsername(request).isEmpty()) {
             return UserContext.unAuthorizedError(response);
         }
-        try{
+        try {
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);
-            Long number = Long.valueOf(body.get("number").toString());
             return cartService.updateCart(id, number, user);
-        } catch (Exception e){
+        } catch (Exception e) {
             response.setStatus(400);
             return Map.of(
                     "ok", false,
@@ -95,19 +95,19 @@ public class CartController {
     }
 
     @DeleteMapping("/{id}")
-    public Map<String,Object> deleteFromCart(
+    public Map<String, Object> deleteFromCart(
             @PathVariable Long id,
             HttpServletRequest request,
             HttpServletResponse response
-    ){
-        if(UserContext.getCurrentUsername(request).isEmpty()){
+    ) {
+        if (UserContext.getCurrentUsername(request).isEmpty()) {
             return UserContext.unAuthorizedError(response);
         }
-        try{
+        try {
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);
             return cartService.deleteFromCart(id, user);
-        } catch (Exception e){
+        } catch (Exception e) {
             response.setStatus(400);
             return Map.of(
                     "ok", false,

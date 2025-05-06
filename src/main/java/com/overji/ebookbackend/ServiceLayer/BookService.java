@@ -52,9 +52,7 @@ public class BookService {
 
     public Map<String, Object> getBookById(Long id) {
         Book book = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
-        return Map.of(
-                "book", book.toMap()
-        );
+        return book.toMap();
     }
 
     @Transactional
@@ -110,13 +108,16 @@ public class BookService {
 
     public Map<String, Object> getBookComments(Long bookId, String orderBy, int pageIndex, int pageSize, User user) {
         List<Map<String, Object>> comments;
-        if (Objects.equals(orderBy, "likes")) {
+        System.out.println("orderBy = " + orderBy);
+        if (Objects.equals(orderBy, "like")) {
+            System.out.println("orderByLike = " + orderBy);
             List<Comment> commentList = bookRepository.getBookCommentsByLikes(bookId);
             comments = commentList.stream().map(
                     comment -> comment.toMap(user)
             ).toList();
         } else {
-            List<Comment> commentList = bookRepository.getBookCommentsByLikes(bookId);
+            System.out.println("orderByCreatedTime = " + orderBy);
+            List<Comment> commentList = bookRepository.getBookCommentsByTime(bookId);
             comments = commentList.stream().map(
                     comment -> comment.toMap(user)
             ).toList();

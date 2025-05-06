@@ -143,7 +143,7 @@ public class BookController {
             );
         }
         if(sort == null){
-            sort = "time";
+            sort = "createdTime";
         }
         if (pageIndex < 0) {
             pageIndex = 0;

@@ -45,7 +45,12 @@ public class UserController {
         if (balance == null) {
             balance = 0L;
         }
-
+        if(avatar == null){
+            avatar = "";
+        }
+        if(introduction == null){
+            introduction = "";
+        }
 
         // 这里可以添加逻辑，例如保存用户到数据库
         User user = new User();
@@ -121,25 +126,22 @@ public class UserController {
     }
 
     @PostMapping("/me/avatar")
-    public Map<String, Object> uploadAvatar(@RequestBody Map<String, String> requestData,
+    public Map<String, Object> uploadAvatar(@RequestParam("file") org.springframework.web.multipart.MultipartFile file,
                                             HttpServletRequest request,
-                                            HttpServletResponse response
-    ) {
-        String fileContent = requestData.get("file");
-        if (fileContent == null || fileContent.isEmpty()) {
+                                            HttpServletResponse response) {
+        if (file == null || file.isEmpty()) {
             return Map.of(
                     "status", 400,
-                    "message", "File content is empty"
+                    "message", "File is empty"
             );
         }
 
-        // 检查文件类型并移除 Base64 前缀
+        // 检查文件类型
+        String originalFilename = file.getOriginalFilename();
         String fileExtension;
-        if (fileContent.startsWith("data:image/jpeg;base64,")) {
-            fileContent = fileContent.substring("data:image/jpeg;base64,".length());
+        if (originalFilename != null && originalFilename.endsWith(".jpg")) {
             fileExtension = ".jpg";
-        } else if (fileContent.startsWith("data:image/png;base64,")) {
-            fileContent = fileContent.substring("data:image/png;base64,".length());
+        } else if (originalFilename != null && originalFilename.endsWith(".png")) {
             fileExtension = ".png";
         } else {
             response.setStatus(400);
@@ -149,30 +151,33 @@ public class UserController {
             );
         }
 
-        // 保存文件到本地
-        String savePath = "avatars/";
+        // 保存文件到当前运行文件夹下的 ./avatars 文件夹
+        String savePath = System.getProperty("user.dir") + File.separator + "avatars" + File.separator;
         String filename = System.currentTimeMillis() + fileExtension; // 使用当前时间戳作为文件名
         File directory = new File(savePath);
         if (!directory.exists()) {
-            directory.mkdirs(); // 创建目录
+            if (!directory.mkdirs()) { // 创建目录失败
+                response.setStatus(500);
+                return Map.of(
+                        "status", 500,
+                        "message", "Failed to create directory for file upload"
+                );
+            }
         }
 
-        String filePath = savePath + filename; // 根据文件类型设置文件名
+        String filePath = savePath + filename;
         try {
-            byte[] decodedBytes = java.util.Base64.getDecoder().decode(fileContent); // 解码 Base64 内容
-            try (java.io.FileOutputStream fos = new java.io.FileOutputStream(filePath)) {
-                fos.write(decodedBytes); // 保存文件
-            }
-            //需要修改数据库中username对应的avatar项
+            file.transferTo(new File(filePath)); // 保存文件
+            // 更新数据库中 username 对应的 avatar 项
             String username = UserContext.getCurrentUsername(request);
-            this.userService.updateAvatarByUsername(username, filePath);
+            this.userService.updateAvatarByUsername(username, filename);
             return Map.of(
                     "status", 200,
                     "message", "File uploaded successfully",
-                    "filePath", filePath,
+                    "filePath", filename,
                     "ok", true
             );
-        } catch (IOException | IllegalArgumentException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             response.setStatus(500);
             return Map.of(
@@ -201,7 +206,7 @@ public class UserController {
         return user.toMap();
     }
 
-    @PostMapping("/me/address")
+    @PostMapping("/me/addresses")
     public Map<String, Object> addUserAddress(@RequestBody Map<String, String> requestData,
                                               HttpServletRequest request,
                                               HttpServletResponse response) {
@@ -226,7 +231,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/me/address")
+    @GetMapping("/me/addresses")
     public List<Map<String, Object>> getUserAddresses(HttpServletRequest request,
                                                       HttpServletResponse response) {
         String username = UserContext.getCurrentUsername(request);

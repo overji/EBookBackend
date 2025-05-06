@@ -31,11 +31,11 @@ public class CartService {
         )).toList();
     }
 
-    public Map<String,Object> addToCart(Long bookId, User user) {
+    public Map<String,Object> addToCart(Long bookId, User user,Long number) {
         if(cartRepository.findByUserId(user.getId()).stream()
                 .anyMatch(c -> c.getBook().getId().equals(bookId))){
             return Map.of(
-                    "message", "Book already in cart",
+                    "message", "书本已经在购物车中",
                     "ok",false,
                     "data",Map.of()
             );
@@ -43,7 +43,7 @@ public class CartService {
         Cart cart = new Cart();
         cart.setUser(user);
         cart.setBook(bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found")));
-        cart.setNumber(1L);
+        cart.setNumber(number);
         cart.setUserCartId(user.getCartId());
         cartRepository.save(cart);
         return Map.of(
