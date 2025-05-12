@@ -43,7 +43,7 @@ public class UserController {
         String introduction = (String) requestData.get("introduction");
         Long balance = (Long) requestData.get("balance");
         if (balance == null) {
-            balance = 0L;
+            balance = 1000000L;
         }
         if(avatar == null){
             avatar = "";
@@ -67,6 +67,7 @@ public class UserController {
             return Map.of(
                     "status", 200,
                     "message", "User registered successfully",
+                    "ok", true,
                     "id", user.getId(),
                     "username", username,
                     "email", email
@@ -200,7 +201,8 @@ public class UserController {
             return Map.of(
                     "message", "User not found",
                     "ok", false,
-                    "data", Map.of()
+                    "data", Map.of(),
+                    "failed", true
             );
         }
         return user.toMap();

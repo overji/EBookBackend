@@ -56,6 +56,10 @@ public class OrderService {
             book.setSales(book.getSales() + cart.getNumber());
             bookRepository.save(book);
         }
+        for (Long itemId : itemIds) {
+            Cart cart = cartRepository.findByUserIdAndUserCartId(user.getId(),itemId);
+            cartRepository.delete(cart);
+        }
         this.orderRepository.save(order);
         user.setBalance(user.getBalance() - totalMoney);
         userRepository.save(user);
