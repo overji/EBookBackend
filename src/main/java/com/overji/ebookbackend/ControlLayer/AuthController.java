@@ -19,7 +19,7 @@ import java.util.Objects;
 public class AuthController {
     private final AuthenticationManager authenticationManager;
 
-    public AuthController(UserRepository userRepository, AuthenticationManager authenticationManager) {
+    public AuthController(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
 

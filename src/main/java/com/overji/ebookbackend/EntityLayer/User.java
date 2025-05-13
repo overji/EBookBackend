@@ -25,9 +25,6 @@ public class User {
     @Column(nullable = false)
     private Long balance;
 
-    @Column(nullable = false)
-    private String password;
-
     @Column
     private String email;
 
@@ -55,6 +52,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
 
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
+    private UserAuth auth = new UserAuth();
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -71,12 +71,21 @@ public class User {
         return username;
     }
 
+    public void setAuth(UserAuth auth) {
+        this.auth = auth;
+    }
+
+    public UserAuth getAuth() {
+        return auth;
+    }
+
     public void setPassword(String password) {
-        this.password = password;
+
+        this.auth.setPassword(password);
     }
 
     public String getPassword() {
-        return password;
+        return this.auth.getPassword();
     }
 
     public void setEmail(String email) {

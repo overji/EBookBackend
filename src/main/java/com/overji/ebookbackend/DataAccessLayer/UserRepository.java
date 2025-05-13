@@ -15,7 +15,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     //根据username和password修改密码
     @Transactional
     @Modifying
-    @Query("UPDATE User u SET u.password = ?2 WHERE u.username = ?1")
+    @Query("UPDATE User u SET u.auth.password = ?2 WHERE u.username = ?1")
     void updatePasswordByUsername(String username, String password);
     //根据username和introduction修改简介
     @Transactional

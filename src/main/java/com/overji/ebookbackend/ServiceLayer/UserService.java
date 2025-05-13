@@ -1,5 +1,7 @@
 package com.overji.ebookbackend.ServiceLayer;
 
+import com.overji.ebookbackend.DataAccessLayer.UserAuthRepository;
+import com.overji.ebookbackend.EntityLayer.UserAuth;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.overji.ebookbackend.EntityLayer.User;
 import com.overji.ebookbackend.DataAccessLayer.UserRepository;
@@ -13,11 +15,13 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserAuthRepository userAuthRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserAuthRepository userAuthRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userAuthRepository = userAuthRepository;
     }
 
     public List<User> getAllUsers() {
@@ -31,10 +35,17 @@ public class UserService {
 
     public void addUser(User user) {
         try {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            // 初始化 UserAuth 并设置关联
+            UserAuth userAuth = new UserAuth();
+            userAuth.setUser(user); // 设置 UserAuth 的 user 属性
+            userAuth.setPassword(passwordEncoder.encode(user.getPassword())); // 加密密码
+
+            // 设置 User 的 auth 属性
+            user.setAuth(userAuth);
+
+            // 保存 User 实体（级联保存 UserAuth）
             userRepository.save(user);
         } catch (Exception e) {
-            // 捕获异常并抛出自定义异常
             throw new RuntimeException("Failed to save user: " + e.getMessage(), e);
         }
     }
@@ -52,10 +63,10 @@ public class UserService {
     }
 
     public void updatePasswordByUsername(String username, String password) {
-        if(username == null) {
+        if (username == null) {
             throw new IllegalArgumentException("Unlogged in!");
         }
-        if(password == null){
+        if (password == null) {
             throw new IllegalArgumentException("New Password cannot be null");
         }
         try {
@@ -66,11 +77,11 @@ public class UserService {
         }
     }
 
-    public void updateIntroductionByUsername(String username,String introduction){
-        if(username == null) {
+    public void updateIntroductionByUsername(String username, String introduction) {
+        if (username == null) {
             throw new IllegalArgumentException("Unlogged in!");
         }
-        if(introduction == null){
+        if (introduction == null) {
             throw new IllegalArgumentException("New Introduction cannot be null");
         }
         try {
@@ -81,11 +92,11 @@ public class UserService {
         }
     }
 
-    public void updateAvatarByUsername(String username,String avatarPath){
-        if(username == null) {
+    public void updateAvatarByUsername(String username, String avatarPath) {
+        if (username == null) {
             throw new IllegalArgumentException("Unlogged in!");
         }
-        if(avatarPath == null){
+        if (avatarPath == null) {
             throw new IllegalArgumentException("New Avatar cannot be null");
         }
         try {
