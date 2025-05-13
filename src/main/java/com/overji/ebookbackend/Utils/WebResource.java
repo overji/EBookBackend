@@ -5,6 +5,11 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * WebResource
+ * 处理静态资源的配置类
+ * 主要用于处理文件上传的路径映射
+ */
 @Configuration
 public class WebResource implements WebMvcConfigurer {
 

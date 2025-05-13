@@ -13,12 +13,26 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/*
+* this controller is used to handle the cart related requests
+* it includes:
+* 1. get all items in the cart
+* 2. add item to the cart
+* 3. update item in the cart
+* 4. delete item from the cart
+* 5. get all items in the cart by user id
+* 6. add item to the cart by user id
+* 7. update item in the cart by user id
+* 8. delete item from the cart by user id
+ */
+
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
     private final CartService cartService;
     private final UserService userService;
 
+    // Constructor-based dependency injection
     public CartController(CartService cartService, UserService userService) {
         this.cartService = cartService;
         this.userService = userService;
@@ -29,9 +43,11 @@ public class CartController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
+        // Check if the user is authenticated
         if (UserContext.getCurrentUsername(request).isEmpty()) {
             return UserContext.unAuthorizedError(response);
         }
+        // If authenticated, proceed to get the cart items
         try {
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);
@@ -53,10 +69,12 @@ public class CartController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
+        // Check if the user is authenticated
         if (UserContext.getCurrentUsername(request).isEmpty()) {
             return UserContext.unAuthorizedError(response);
         }
         try {
+            // insert the book into the cart
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);
             return cartService.addToCart(bookId, user, number);
@@ -77,10 +95,12 @@ public class CartController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
+        // Check if the user is authenticated
         if (UserContext.getCurrentUsername(request).isEmpty()) {
             return UserContext.unAuthorizedError(response);
         }
         try {
+            // update the book in the cart
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);
             return cartService.updateCart(id, number, user);
@@ -100,10 +120,12 @@ public class CartController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
+        // Check if the user is authenticated
         if (UserContext.getCurrentUsername(request).isEmpty()) {
             return UserContext.unAuthorizedError(response);
         }
         try {
+            // delete the book from the cart
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);
             return cartService.deleteFromCart(id, user);

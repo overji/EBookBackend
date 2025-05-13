@@ -14,6 +14,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+/*
+* this class is used to handle user-related requests
+* it includes user registration, login, password change, and user information retrieval
+ */
 
 @RestController
 @RequestMapping("/api/user")
@@ -27,6 +31,7 @@ public class UserController {
         this.userAddressService = userAddressService;
     }
 
+    // can be ignored
     @GetMapping("/test")
     public List<Map<String, Object>> getAllUsers() {
         List<User> users = userService.getAllUsers();
@@ -35,6 +40,7 @@ public class UserController {
 
     @PostMapping("/register")
     public Map<String, Object> registerUser(@RequestBody Map<String, Object> requestData) {
+        // get parameters from request
         String username = (String) requestData.get("username");
         String password = (String) requestData.get("password");
         String nickname = (String) requestData.get("nickname");
@@ -86,6 +92,7 @@ public class UserController {
     public Map<String, Object> changePassword(@RequestBody Map<String, String> requestData,
                                               HttpServletRequest request,
                                               HttpServletResponse response) {
+        // 获取当前登录用户的用户名
         String username = UserContext.getCurrentUsername(request);
         try {
             this.userService.updatePasswordByUsername(username, requestData.get("password"));
@@ -108,6 +115,7 @@ public class UserController {
     public Map<String, Object> changeIntroduction(@RequestBody Map<String, String> requestData,
                                                   HttpServletRequest request,
                                                   HttpServletResponse response) {
+        //修改用户简介
         String username = UserContext.getCurrentUsername(request);
         try {
             this.userService.updateIntroductionByUsername(username, requestData.get("introduction"));
@@ -194,6 +202,7 @@ public class UserController {
     public Map<String, Object> getUserInfo(HttpServletRequest request,
                                            HttpServletResponse response
     ) {
+        //获取个人信息
         String username = UserContext.getCurrentUsername(request);
         User user = this.userService.getUserByUsername(username);
         if (user == null) {

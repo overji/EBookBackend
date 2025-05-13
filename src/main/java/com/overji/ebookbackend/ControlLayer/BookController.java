@@ -14,6 +14,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+/*
+* this controller is used to handle all the requests related to books
+* it includes:
+* 1. get all books
+* 2. get book by id
+* 3. get all tags
+* 4. insert book
+* 5. get book comments
+* 6. post book comment
+* 7. get top 10 books
+* 8. get books by tag
+* 9. get books by keyword
+*/
 
 @RestController
 @RequestMapping("/api")
@@ -22,6 +35,8 @@ public class BookController {
     private final CommentService commentService;
     private final UserService userService;
 
+    // Constructor injection for services
+    // which can be autowired by Spring
     public BookController(BookService bookService, CommentService commentService, UserService userService) {
         this.bookService = bookService;
         this.commentService = commentService;
@@ -36,11 +51,12 @@ public class BookController {
             @RequestParam int pageSize,
             HttpServletResponse response,
             HttpServletRequest request) {
+        // Check if the user is logged in
         if (UserContext.getCurrentUsername(request).isEmpty()) {
             return UserContext.unAuthorizedError(response);
         }
 
-
+        // Validate and sanitize input parameters
         tag = tag == null ? "" : tag.trim();
         keyword = keyword == null ? "" : keyword.trim();
 
@@ -50,7 +66,7 @@ public class BookController {
         if (pageSize < 1) {
             pageSize = 8;
         }
-
+        // get books by tag and(or) keyword
         return bookService.getBooks(tag, keyword, pageIndex, pageSize);
     }
 
@@ -59,9 +75,11 @@ public class BookController {
             HttpServletResponse response,
             HttpServletRequest request
     ) {
+        // Check if the user is logged in
         if (UserContext.getCurrentUsername(request).isEmpty()) {
             return UserContext.unAuthorizedError(response);
         }
+        // get top 10 books
         return bookService.getTop10Books();
     }
 
@@ -71,12 +89,15 @@ public class BookController {
             HttpServletResponse response,
             HttpServletRequest request
     ) {
+        // Check if the user is logged in
         if (UserContext.getCurrentUsername(request).isEmpty()) {
             return UserContext.unAuthorizedError(response);
         }
         try{
+            // get book by id
             return bookService.getBookById(id);
         } catch (Exception e) {
+            // if the book is not found
             response.setStatus(404);
             return Map.of(
                     "status", 404,
@@ -92,9 +113,11 @@ public class BookController {
             HttpServletResponse response,
             HttpServletRequest request
     ) {
+        // Check if the user is logged in
         if (UserContext.getCurrentUsername(request).isEmpty()) {
             return UserContext.unAuthorizedError(response);
         }
+        // get all tags
         return bookService.getAllTags();
     }
 
@@ -104,9 +127,11 @@ public class BookController {
             HttpServletResponse response,
             HttpServletRequest request
     ) {
+        // Check if the user is logged in
         if (UserContext.getCurrentUsername(request).isEmpty()) {
             return UserContext.unAuthorizedError(response);
         }
+        // insert book
         String title = (String) requestData.get("title");
         String author = (String) requestData.get("author");
         String description = (String) requestData.get("description");
@@ -131,9 +156,11 @@ public class BookController {
             HttpServletResponse response,
             HttpServletRequest request
     ) {
+        // Check if the user is logged in
         if (UserContext.getCurrentUsername(request).isEmpty()) {
             return UserContext.unAuthorizedError(response);
         }
+        // get book comments by parameters: id, sort, pageIndex, pageSize
         if(id == null){
             response.setStatus(404);
             return Map.of(
@@ -152,6 +179,7 @@ public class BookController {
             pageSize = 8;
         }
         try{
+            // get book comments by id
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);
             return bookService.getBookComments(id, sort, pageIndex, pageSize, user);
@@ -172,9 +200,11 @@ public class BookController {
             HttpServletResponse response,
             HttpServletRequest request
     ) {
+        // Check if the user is logged in
         if (UserContext.getCurrentUsername(request).isEmpty()) {
             return UserContext.unAuthorizedError(response);
         }
+        // post book comment
         String content = (String) requestData.get("content");
         String username = UserContext.getCurrentUsername(request);
         User user = userService.getUserByUsername(username);

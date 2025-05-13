@@ -11,6 +11,13 @@ import com.overji.ebookbackend.ServiceLayer.*;
 import java.util.List;
 import java.util.Map;
 
+/*
+* this controller is used to handle order related requests
+* it includes:
+* 1. get all orders by user id
+* 2. add order by book id
+* 3. add order by order id
+ */
 @RestController
 @RequestMapping("/api/order")
 public class OrderController {
@@ -28,12 +35,15 @@ public class OrderController {
             HttpServletRequest request,
             HttpServletResponse response
     ){
+        // Check if the user is logged in
         if(UserContext.getCurrentUsername(request).isEmpty()){
             return UserContext.unAuthorizedError(response);
         }
         try{
+            // Get the username from the request
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);
+            // get all orders by user id
             return orderService.getOrdersByUserId(user.getId());
         } catch (Exception e){
             response.setStatus(400);
@@ -45,6 +55,8 @@ public class OrderController {
         }
     }
 
+    // this api is used for directly purchase a book with certain numbers
+    // in the book page, without adding it to the cart
     @PostMapping("/{bookId}")
     public Map<String,Object> addOrderByBookId(
             @PathVariable Long bookId,
@@ -57,6 +69,7 @@ public class OrderController {
             return UserContext.unAuthorizedError(response);
         }
         try{
+            // add one order by book id
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);
             String address = body.get("address").toString();
@@ -73,6 +86,7 @@ public class OrderController {
         }
     }
 
+    //this api is used for purchase in the cart
     @PostMapping("")
     public Map<String,Object> addOrder(
             @RequestBody Map<String,Object> body,

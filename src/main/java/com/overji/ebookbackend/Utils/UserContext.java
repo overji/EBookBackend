@@ -9,6 +9,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+/**
+ * UserContext
+ * 用于获取当前用户的信息
+ */
 @Component
 public class UserContext {
     static public String getCurrentUsername(HttpServletRequest request) {

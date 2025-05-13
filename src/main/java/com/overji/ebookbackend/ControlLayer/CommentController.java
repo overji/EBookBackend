@@ -10,6 +10,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+/*
+* this controller is used to handle comment related requests
+* it includes:
+* 1. like a comment
+* 2. unlike a comment
+* 3. reply to a comment
+* 4. get all comments
+ */
+
 @RestController
 @RequestMapping("/api/comment")
 public class CommentController {
