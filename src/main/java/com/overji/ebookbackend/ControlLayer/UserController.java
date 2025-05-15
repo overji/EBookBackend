@@ -252,7 +252,7 @@ public class UserController {
                 .toList();
     }
 
-    @DeleteMapping("/me/address/{userAddrId}")
+    @DeleteMapping("/me/addresses/{userAddrId}")
     public Map<String, Object> deleteUserAddress(@PathVariable Long userAddrId,
                                                  HttpServletRequest request,
                                                  HttpServletResponse response) {
