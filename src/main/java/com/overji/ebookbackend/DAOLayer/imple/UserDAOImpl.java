@@ -1,0 +1,53 @@
+package com.overji.ebookbackend.DAOLayer.imple;
+
+import com.overji.ebookbackend.DAOLayer.UserDAO;
+import com.overji.ebookbackend.EntityLayer.User;
+import com.overji.ebookbackend.RepositoryLayer.UserRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public class UserDAOImpl implements UserDAO {
+    private final UserRepository userRepository;
+
+    public UserDAOImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
+    @Override
+    public void updatePasswordByUsername(String username, String password) {
+        userRepository.updatePasswordByUsername(username, password);
+    }
+
+    @Override
+    public void updateIntroductionByUsername(String username, String introduction) {
+        userRepository.updateIntroductionByUsername(username, introduction);
+    }
+
+    @Override
+    public void updateAvatarByUsername(String username, String avatar) {
+        userRepository.updateAvatarByUsername(username, avatar);
+    }
+}

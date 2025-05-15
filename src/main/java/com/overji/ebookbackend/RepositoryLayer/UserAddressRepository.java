@@ -1,4 +1,4 @@
-package com.overji.ebookbackend.DataAccessLayer;
+package com.overji.ebookbackend.RepositoryLayer;
 
 import com.overji.ebookbackend.EntityLayer.UserAddress;
 import org.springframework.data.jpa.repository.JpaRepository;

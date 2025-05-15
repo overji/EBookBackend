@@ -1,9 +1,6 @@
 package com.overji.ebookbackend.ControlLayer;
 
-import com.overji.ebookbackend.DataAccessLayer.UserRepository;
-import com.overji.ebookbackend.EntityLayer.User;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,7 +9,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Objects;
 
 /*
 *  AuthController.java

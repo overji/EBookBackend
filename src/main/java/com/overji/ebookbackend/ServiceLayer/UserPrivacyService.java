@@ -1,7 +1,7 @@
 package com.overji.ebookbackend.ServiceLayer;
 
+import com.overji.ebookbackend.DAOLayer.UserDAO;
 import com.overji.ebookbackend.EntityLayer.User;
-import com.overji.ebookbackend.DataAccessLayer.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,15 +10,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserPrivacyService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UserDAO userDAO;
 
-    public UserPrivacyService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserPrivacyService(UserDAO userDAO) {
+        this.userDAO = userDAO;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
+        User user = userDAO.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }

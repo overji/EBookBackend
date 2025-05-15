@@ -1,6 +1,5 @@
-package com.overji.ebookbackend.DataAccessLayer;
+package com.overji.ebookbackend.RepositoryLayer;
 import com.overji.ebookbackend.EntityLayer.Book;
-import com.overji.ebookbackend.EntityLayer.BookTag;
 import com.overji.ebookbackend.EntityLayer.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
