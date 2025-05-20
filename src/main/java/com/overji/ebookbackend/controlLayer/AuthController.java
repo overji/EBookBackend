@@ -1,7 +1,11 @@
 package com.overji.ebookbackend.controlLayer;
 
+import com.overji.ebookbackend.entityLayer.User;
+import com.overji.ebookbackend.serviceLayer.UserService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -11,21 +15,23 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 /*
-*  AuthController.java
-*  Include APIs: login, logout
-*/
+ *  AuthController.java
+ *  Include APIs: login, logout
+ */
 
 @RestController
 @RequestMapping("/api")
 public class AuthController {
     private final AuthenticationManager authenticationManager;
+    private final UserService userService;
 
-    public AuthController(AuthenticationManager authenticationManager) {
+    public AuthController(AuthenticationManager authenticationManager, UserService userService) {
         this.authenticationManager = authenticationManager;
+        this.userService = userService;
     }
 
     @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody Map<String, String> requestData, HttpServletResponse response) {
+    public Map<String, Object> login(@RequestBody Map<String, String> requestData, HttpServletRequest request) {
         String username = requestData.get("username");
         String password = requestData.get("password");
         try {
@@ -35,36 +41,42 @@ public class AuthController {
             );
 
             // 创建一个 Cookie
-            Cookie cookie = new Cookie("username", username);
-            cookie.setHttpOnly(true); // 设置 HttpOnly 属性
-            cookie.setPath("/"); // 设置 Cookie 的作用路径
-            cookie.setMaxAge(7 * 24 * 60 * 60); // 设置 Cookie 的过期时间（7days）
-            response.addCookie(cookie); // 将 Cookie 添加到响应中
+            request.getSession().setAttribute("username", username);
+
+            // 判断是否是管理员
+            User user = userService.getUserByUsername(username);
+            boolean isAdmin = user.getAuth().getUserPrivilege() == 1;
+            if (isAdmin) {
+                request.getSession().setAttribute("isAdmin", true);
+            } else {
+                request.getSession().setAttribute("isAdmin", false);
+            }
+
+
 
             // 设置登录成功后的响应
             return Map.of(
                     "message", "ok",
                     "ok", true,
-                    "data", Map.of()
+                    "data", Map.of(),
+                    "isAdmin", isAdmin
             );
         } catch (AuthenticationException e) {
             // 身份验证失败
+            e.printStackTrace();
             return Map.of(
                     "message", "fail",
                     "ok", false,
-                    "data", Map.of()
+                    "data", Map.of(),
+                    "isAdmin", false
             );
         }
     }
 
     @PutMapping("/logout")
-    public Map<String, Object> logout(HttpServletResponse response) {
-        // 清除 Cookie
-        Cookie cookie = new Cookie("username", null);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0); // 设置过期时间为 0，表示删除 Cookie
-        response.addCookie(cookie);
+    public Map<String, Object> logout(HttpServletRequest request) {
+        // 清除 Session
+        request.getSession().invalidate();
 
         // 设置登出成功后的响应
         return Map.of(

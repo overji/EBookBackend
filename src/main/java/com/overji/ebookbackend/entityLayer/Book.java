@@ -29,6 +29,12 @@ public class Book {
     private Long price;
 
     @Column
+    private Long stock = 10000L;
+
+    @Column
+    private String isbn = "";
+
+    @Column
     @Lob
     private String cover;
 
@@ -143,7 +149,9 @@ public class Book {
                 "price", price,
                 "cover", cover,
                 "sales", sales,
-                "tags", tags.stream().map(BookTag::toMap).toList()
+                "tags", tags.stream().map(BookTag::toMap).toList(),
+                "isbn", isbn,
+                "stock", stock
         );
     }
 

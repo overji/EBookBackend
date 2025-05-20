@@ -18,6 +18,8 @@ public class WebResource implements WebMvcConfigurer {
         // 将本地文件夹 uploads 映射到 /uploads/** 路径
         registry.addResourceHandler("/api/user/avatars/**")
                 .addResourceLocations("file:avatars/");
+        registry.addResourceHandler("/api/book/covers/**")
+                .addResourceLocations("file:book_covers/");
     }
     
     @Override

@@ -14,15 +14,8 @@ import java.util.Map;
 @Component
 public class UserContext {
     static public String getCurrentUsername(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("username".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return "";
+        String username = (String)request.getSession().getAttribute("username");
+        return (username == null)?"":username;
     }
 
     static public Map<String, Object> unAuthorizedError(HttpServletResponse response) {

@@ -144,6 +144,22 @@ public class User {
         this.userAddresses = userAddresses;
     }
 
+    public Long getUserPrivilege() {
+        return this.auth.getUserPrivilege();
+    }
+
+    public void setUserPrivilege(Long userPrivilege) {
+        this.auth.setUserPrivilege(userPrivilege);
+    }
+
+    public Boolean getIsDisabled() {
+        return this.auth.getIsDisabled();
+    }
+
+    public void setIsDisabled(Boolean isDisabled) {
+        this.auth.setIsDisabled(isDisabled);
+    }
+
     public Map<String, Object> toMap() {
         return Map.of(
                 "id", id,
@@ -153,7 +169,8 @@ public class User {
                 "email", email,
                 "introduction", introduction,
                 "avatar", avatar,
-                "createdAt", createdAt
+                "createdAt", createdAt,
+                "privilege", this.getUserPrivilege()
         );
     }
 

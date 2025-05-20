@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 /*
@@ -78,6 +80,100 @@ public class BookController {
         }
         // get top 10 books
         return bookService.getTop10Books();
+    }
+
+    @DeleteMapping("/book_covers/{filename}")
+    public Map<String, Object> deleteBookCover(
+            @PathVariable String filename,
+            HttpServletResponse response,
+            HttpServletRequest request
+    ) {
+        // Check if the user is logged in
+        if (UserContext.getCurrentUsername(request).isEmpty()) {
+            return UserContext.unAuthorizedError(response);
+        }
+        // delete book cover
+        String filePath = System.getProperty("user.dir") + File.separator + "book-covers" + File.separator + filename;
+        File file = new File(filePath);
+        if (file.exists()) {
+            if (file.delete()) {
+                return Map.of(
+                        "status", 200,
+                        "message", "ok",
+                        "ok", true
+                );
+            } else {
+                response.setStatus(500);
+                return Map.of(
+                        "status", 500,
+                        "message", "Failed to delete file"
+                );
+            }
+        } else {
+            response.setStatus(404);
+            return Map.of(
+                    "status", 404,
+                    "message", "File not found"
+            );
+        }
+    }
+
+    @PostMapping("/books/cover")
+    public Map<String, Object> uploadCover(@RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+                                            HttpServletRequest request,
+                                            HttpServletResponse response) {
+        if (file == null || file.isEmpty()) {
+            return Map.of(
+                    "status", 400,
+                    "message", "File is empty"
+            );
+        }
+        try{
+            // 检查文件类型
+            String originalFilename = file.getOriginalFilename();
+            String fileExtension;
+            if (originalFilename != null && originalFilename.endsWith(".jpg")) {
+                fileExtension = ".jpg";
+            } else if (originalFilename != null && originalFilename.endsWith(".png")) {
+                fileExtension = ".png";
+            } else {
+                response.setStatus(400);
+                return Map.of(
+                        "status", 400,
+                        "message", "Unsupported file format"
+                );
+            }
+
+            // 保存文件到当前运行文件夹下的 ./avatars 文件夹
+            String savePath = System.getProperty("user.dir") + File.separator + "book-covers" + File.separator;
+            String filename = System.currentTimeMillis() + fileExtension; // 使用当前时间戳作为文件名
+            File directory = new File(savePath);
+            if (!directory.exists()) {
+                if (!directory.mkdirs()) { // 创建目录失败
+                    response.setStatus(500);
+                    return Map.of(
+                            "status", 500,
+                            "message", "Failed to create directory for file upload"
+                    );
+                }
+            }
+
+            String filePath = savePath + filename;
+            file.transferTo(new File(filePath)); // 保存文件
+            // 返回文件路径
+            return Map.of(
+                    "status", 200,
+                    "message", "ok",
+                    "ok", true,
+                    "filePath", "book_covers/" + filename // 返回文件路径
+            );
+        } catch (Exception e) {
+            response.setStatus(500);
+            return Map.of(
+                    "status", 500,
+                    "message", "File upload failed: " + e.getMessage()
+            );
+        }
     }
 
     @GetMapping("/book/{id}")
