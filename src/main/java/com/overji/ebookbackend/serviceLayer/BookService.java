@@ -10,9 +10,13 @@ public interface BookService {
 
     Map<String, Object> getBookById(Long id);
 
-    void insertBook(String title, String author, String description, Long price, String cover, List<String> tags);
+    Map<String, Object> updateBook(Long id, String title, String author, String description, Long price, String cover, List<String> tags, Long stock, String ISBN);
 
-    void updateSales(Long id, Long sales);
+    Map<String, Object> insertBook(String title, String author, String description, Long price, String cover, List<String> tags, Long stock, String ISBN);
+
+    Map<String, Object> updateSales(Long id, Long sales);
+
+    Map<String, Object> deleteBook(Long id);
 
     List<String> getAllTags();
 

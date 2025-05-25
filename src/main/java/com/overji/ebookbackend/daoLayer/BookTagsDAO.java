@@ -6,5 +6,8 @@ import java.util.List;
 
 public interface BookTagsDAO {
     void save(BookTag bookTag);
+
     List<BookTag> findAll();
+
+    void delete(BookTag tag);
 }

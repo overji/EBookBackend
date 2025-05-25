@@ -49,6 +49,14 @@ public class OrderServiceImpl implements OrderService {
         for (Long itemId : itemIds) {
             Cart cart = cartDAO.findByUserIdAndUserCartId(user.getId(), itemId);
             Book book = bookDAO.findById(cart.getBook().getId()).orElseThrow(() -> new RuntimeException("Book not found"));
+            if(book.getStock() < cart.getNumber()) {
+                orderDAO.delete(order);
+                return Map.of(
+                        "message", "库存不足",
+                        "ok", false,
+                        "data", Map.of()
+                );
+            }
             OrderItem orderItem = new OrderItem();
             orderItem.setBook(book);
             orderItem.setNumber(cart.getNumber());
@@ -88,6 +96,13 @@ public class OrderServiceImpl implements OrderService {
                     "data", Map.of()
             );
         }
+        if (book.getStock() < number) {
+            return Map.of(
+                    "message", "库存不足",
+                    "ok", false,
+                    "data", Map.of()
+            );
+        }
         Order order = new Order();
         order.setUser(user);
         order.setAddress(address);
@@ -102,6 +117,7 @@ public class OrderServiceImpl implements OrderService {
         order.addItem(orderItem);
         orderItemDAO.save(orderItem);
         book.setSales(book.getSales() + number);
+        book.setStock(book.getStock() - number);
         bookDAO.save(book);
         user.setBalance(user.getBalance() - totalMoney);
         userDAO.save(user);

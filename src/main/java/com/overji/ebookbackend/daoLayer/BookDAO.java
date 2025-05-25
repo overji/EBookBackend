@@ -24,4 +24,6 @@ public interface BookDAO {
     Optional<Book> findById(Long id);
 
     void save(Book book);
+
+    void deleteById(Long id);
 }

@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -82,7 +83,7 @@ public class BookController {
         return bookService.getTop10Books();
     }
 
-    @DeleteMapping("/book_covers/{filename}")
+    @DeleteMapping("/book_covers/{filename}/del")
     public Map<String, Object> deleteBookCover(
             @PathVariable String filename,
             HttpServletResponse response,
@@ -198,7 +199,25 @@ public class BookController {
                     "ok", false
             );
         }
+    }
 
+    @DeleteMapping("/book/{id}")
+    public Map<String, Object> deleteBook(
+            @PathVariable Long id,
+            HttpServletResponse response,
+            HttpServletRequest request
+    ) {
+        // Check if the user is logged in
+        if (UserContext.getCurrentUsername(request).isEmpty()) {
+            return UserContext.unAuthorizedError(response);
+        }
+        // delete book by id
+        bookService.deleteBook(id);
+        return Map.of(
+                "status", 200,
+                "message", "ok",
+                "ok", true
+        );
     }
 
     @GetMapping("/book/tags")
@@ -229,15 +248,100 @@ public class BookController {
         String author = (String) requestData.get("author");
         String description = (String) requestData.get("description");
         Long price = ((Number) requestData.get("price")).longValue();
+        Long stock = ((Number) requestData.get("stock")).longValue();
+        String ISBN = (String) requestData.get("ISBN");
         String cover = (String) requestData.get("cover");
         List<String> tags = (List<String>) requestData.get("tags");
 
-        bookService.insertBook(title, author, description, price, cover, tags);
-        return Map.of(
-                "status", 200,
-                "message", "ok",
-                "ok", true
-        );
+        // Validate input data
+        if(title == null){
+            title = "";
+        }
+        if(author == null){
+            author = "";
+        }
+        if(description == null){
+            description = "";
+        }
+        if (price == null || price < 0 || cover == null || cover.isEmpty() || tags == null || tags.isEmpty()) {
+            response.setStatus(400);
+            return Map.of(
+                    "status", 400,
+                    "message", "Invalid input data",
+                    "ok", false
+            );
+        }
+
+        try{
+            return bookService.insertBook(title, author, description, price, cover, tags, stock, ISBN);
+        } catch (Exception e) {
+            response.setStatus(500);
+            return Map.of(
+                    "status", 500,
+                    "message", "Failed to insert book: " + e.getMessage(),
+                    "ok", false
+            );
+        }
+    }
+
+    @PostMapping("/book/modify/{id}")
+    public Map<String, Object> updateBook(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> requestData,
+            HttpServletResponse response,
+            HttpServletRequest request
+    ) {
+        // Check if the user is logged in
+        if (UserContext.getCurrentUsername(request).isEmpty()) {
+            return UserContext.unAuthorizedError(response);
+        }
+        // update book
+        String title = (String) requestData.get("title");
+        String author = (String) requestData.get("author");
+        String description = (String) requestData.get("description");
+        Long price = ((Number) requestData.get("price")).longValue();
+        Long stock = ((Number) requestData.get("stock")).longValue();
+        String ISBN = (String) requestData.get("ISBN");
+        String cover = (String) requestData.get("cover");
+        List<String> tags = (List<String>) requestData.get("tags");
+        System.out.println("Updating book with ID: " + id);
+        System.out.println("Title: " + title);
+        System.out.println("Author: " + author);
+        System.out.println("Description: " + description);
+        System.out.println("Price: " + price);
+        System.out.println("Stock: " + stock);
+        System.out.println("ISBN: " + ISBN);
+        System.out.println("Cover: " + cover);
+        System.out.println("Tags: " + tags);
+        // Validate input data
+        if(title == null){
+            title = "";
+        }
+        if(author == null){
+            author = "";
+        }
+        if(description == null){
+            description = "";
+        }
+        if (price == null || price < 0 || cover == null || cover.isEmpty() || tags == null || tags.isEmpty()) {
+            response.setStatus(400);
+            return Map.of(
+                    "status", 400,
+                    "message", "Invalid input data",
+                    "ok", false
+            );
+        }
+        try {
+            // update book by id
+            return bookService.updateBook(id, title, author, description, price, cover, tags, stock, ISBN);
+        } catch (Exception e) {
+            response.setStatus(404);
+            return Map.of(
+                    "status", 404,
+                    "message", e.getMessage(),
+                    "ok", false
+            );
+        }
     }
 
     @GetMapping("/book/{id}/comments")

@@ -61,4 +61,9 @@ public class BookDAOImpl implements BookDAO {
     public void save(Book book) { // 实现 save 方法
         bookRepository.save(book);
     }
+
+    @Override
+    public void deleteById(Long id) { // 实现 deleteById 方法
+        bookRepository.deleteById(id);
+    }
 }

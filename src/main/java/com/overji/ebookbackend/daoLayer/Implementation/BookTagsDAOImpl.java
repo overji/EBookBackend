@@ -25,4 +25,9 @@ public class BookTagsDAOImpl implements BookTagsDAO {
     public List<BookTag> findAll() {
         return bookTagsRepository.findAll();
     }
+
+    @Override
+    public void delete(BookTag tag) {
+        bookTagsRepository.delete(tag);
+    }
 }

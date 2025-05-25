@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 @Entity
-@Table(name="books")
+@Table(name = "books")
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,18 +15,18 @@ public class Book {
 
     @Lob
     @Column
-    private String title;
+    private String title = "";
 
     @Lob
     @Column
-    private String author;
+    private String author = "";
 
     @Lob
     @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column
-    private Long price;
+    private Long price = 0L;
 
     @Column
     private Long stock = 10000L;
@@ -36,10 +36,10 @@ public class Book {
 
     @Column
     @Lob
-    private String cover;
+    private String cover = "";
 
     @Column
-    private Long sales;
+    private Long sales = 0L;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
@@ -123,8 +123,9 @@ public class Book {
     }
 
     public void removeTag(BookTag tag) {
-        tags.remove(tag);
-        tag.setBook(null);
+        if (tags != null) {
+            tags.remove(tag);
+        }
     }
 
     public void setTagList(List<BookTag> tags) {
@@ -138,6 +139,22 @@ public class Book {
     public void setTag(BookTag tag) {
         this.tags.add(tag);
         tag.setBook(this);
+    }
+
+    public Long getStock() {
+        return stock;
+    }
+
+    public void setStock(Long stock) {
+        this.stock = stock;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
     }
 
     public Map<String, Object> toMap() {

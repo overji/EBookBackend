@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -59,7 +60,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public void insertBook(String title, String author, String description, Long price, String cover, List<String> tags) {
+    public Map<String, Object> insertBook(String title, String author, String description, Long price, String cover, List<String> tags, Long stock, String ISBN) {
         Book book = new Book();
         book.setTitle(title);
         book.setAuthor(author);
@@ -67,6 +68,9 @@ public class BookServiceImpl implements BookService {
         book.setPrice(price);
         book.setCover(cover);
         book.setSales(0L);
+        book.setStock(stock);
+        book.setIsbn(ISBN);
+
         bookDAO.save(book);
         long curIndex = 0L;
         for (String tag : tags) {
@@ -78,14 +82,74 @@ public class BookServiceImpl implements BookService {
             book.addTag(bookTag);
         }
         bookDAO.save(book);
+        return Map.of(
+                "message", "Book inserted successfully",
+                "ok", true,
+                "data", book.toMap(),
+                "id", book.getId()
+        );
     }
 
     @Override
     @Transactional
-    public void updateSales(Long id, Long sales) {
+    public Map<String, Object> updateBook(Long id, String title, String author, String description, Long price, String cover, List<String> tags, Long stock, String ISBN) {
+        Book book = bookDAO.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+        book.setTitle(title);
+        book.setAuthor(author);
+        book.setDescription(description);
+        book.setPrice(price);
+        book.setCover(cover);
+        book.setStock(stock);
+        book.setIsbn(ISBN);
+
+        // 清除旧的标签
+        List<BookTag> existingTags = new ArrayList<>(book.getTags());
+        for (BookTag tag : existingTags) {
+            book.removeTag(tag);
+            bookTagsDAO.delete(tag);
+        }
+
+        // 添加新的标签
+        long curIndex = 0L;
+        for (String tagName : tags) {
+            BookTag bookTag = new BookTag();
+            bookTag.setName(tagName);
+            bookTag.setBook(book);
+            bookTag.setBookTagId(curIndex++);
+            book.addTag(bookTag);
+            bookTagsDAO.save(bookTag);
+        }
+
+        bookDAO.save(book);
+        return Map.of(
+                "message", "Book updated successfully",
+                "ok", true,
+                "data", book.toMap()
+        );
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> updateSales(Long id, Long sales) {
         Book book = bookDAO.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
         book.setSales(book.getSales() + sales);
         bookDAO.save(book);
+        return Map.of(
+                "message", "Sales updated successfully",
+                "ok", true,
+                "data", book.toMap()
+        );
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> deleteBook(Long id) {
+        bookDAO.deleteById(id);
+        return Map.of(
+                "message", "Book deleted successfully",
+                "ok", true,
+                "data", Map.of()
+        );
     }
 
     @Override
