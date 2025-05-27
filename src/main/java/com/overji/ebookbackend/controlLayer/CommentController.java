@@ -36,9 +36,7 @@ public class CommentController {
             HttpServletRequest request,
             HttpServletResponse response
     ){
-        if(UserContext.getCurrentUsername(request).isEmpty()){
-            return UserContext.unAuthorizedError(response);
-        }
+
         try{
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);
@@ -64,9 +62,7 @@ public class CommentController {
             HttpServletRequest request,
             HttpServletResponse response
     ){
-        if(UserContext.getCurrentUsername(request).isEmpty()){
-            return UserContext.unAuthorizedError(response);
-        }
+
         try{
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);
@@ -93,9 +89,7 @@ public class CommentController {
             HttpServletRequest request,
             HttpServletResponse response
     ){
-        if(UserContext.getCurrentUsername(request).isEmpty()){
-            return UserContext.unAuthorizedError(response);
-        }
+
         try{
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);

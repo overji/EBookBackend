@@ -2,18 +2,23 @@ package com.overji.ebookbackend.controlLayer;
 
 import com.overji.ebookbackend.entityLayer.User;
 import com.overji.ebookbackend.serviceLayer.UserService;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+
+import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
 /*
  *  AuthController.java
@@ -35,28 +40,27 @@ public class AuthController {
     public Map<String, Object> login(@RequestBody Map<String, String> requestData, HttpServletRequest request) {
         String username = requestData.get("username");
         String password = requestData.get("password");
+
         try {
-            // 进行身份验证
+            // 使用 AuthenticationManager 进行认证
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // 创建一个 Cookie
-            request.getSession().setAttribute("username", username);
+            // 将认证信息存储到 SecurityContext
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+            securityContext.setAuthentication(authentication);
+
+            // 同步到 Session
+            HttpSession session = request.getSession(true);
+            session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, securityContext);
+            session.setAttribute("username", username);
 
             // 判断是否是管理员
             User user = userService.getUserByUsername(username);
             boolean isAdmin = user.getAuth().getUserPrivilege() == 1;
-            if (isAdmin) {
-                request.getSession().setAttribute("isAdmin", true);
-            } else {
-                request.getSession().setAttribute("isAdmin", false);
-            }
+            session.setAttribute("isAdmin", isAdmin);
 
-
-
-            // 设置登录成功后的响应
             return Map.of(
                     "message", "ok",
                     "ok", true,
@@ -64,7 +68,6 @@ public class AuthController {
                     "isAdmin", isAdmin
             );
         } catch (AuthenticationException e) {
-            // 身份验证失败
             e.printStackTrace();
             return Map.of(
                     "message", "fail",

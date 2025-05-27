@@ -35,10 +35,7 @@ public class OrderController {
             HttpServletRequest request,
             HttpServletResponse response
     ){
-        // Check if the user is logged in
-        if(UserContext.getCurrentUsername(request).isEmpty()){
-            return UserContext.unAuthorizedError(response);
-        }
+
         try{
             // Get the username from the request
             String username = UserContext.getCurrentUsername(request);
@@ -65,9 +62,7 @@ public class OrderController {
             HttpServletRequest request,
             HttpServletResponse response
     ){
-        if(UserContext.getCurrentUsername(request).isEmpty()){
-            return UserContext.unAuthorizedError(response);
-        }
+
         try{
             // add one order by book id
             String username = UserContext.getCurrentUsername(request);
@@ -93,9 +88,7 @@ public class OrderController {
             HttpServletRequest request,
             HttpServletResponse response
     ){
-        if(UserContext.getCurrentUsername(request).isEmpty()){
-            return UserContext.unAuthorizedError(response);
-        }
+
         try{
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);

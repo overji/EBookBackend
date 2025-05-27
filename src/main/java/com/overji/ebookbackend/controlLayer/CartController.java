@@ -42,10 +42,7 @@ public class CartController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        // Check if the user is authenticated
-        if (UserContext.getCurrentUsername(request).isEmpty()) {
-            return UserContext.unAuthorizedError(response);
-        }
+
         // If authenticated, proceed to get the cart items
         try {
             String username = UserContext.getCurrentUsername(request);
@@ -68,10 +65,7 @@ public class CartController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        // Check if the user is authenticated
-        if (UserContext.getCurrentUsername(request).isEmpty()) {
-            return UserContext.unAuthorizedError(response);
-        }
+
         try {
             // insert the book into the cart
             String username = UserContext.getCurrentUsername(request);
@@ -94,10 +88,7 @@ public class CartController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        // Check if the user is authenticated
-        if (UserContext.getCurrentUsername(request).isEmpty()) {
-            return UserContext.unAuthorizedError(response);
-        }
+
         try {
             // update the book in the cart
             String username = UserContext.getCurrentUsername(request);
@@ -119,10 +110,7 @@ public class CartController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        // Check if the user is authenticated
-        if (UserContext.getCurrentUsername(request).isEmpty()) {
-            return UserContext.unAuthorizedError(response);
-        }
+
         try {
             // delete the book from the cart
             String username = UserContext.getCurrentUsername(request);

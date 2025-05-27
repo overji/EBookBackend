@@ -51,10 +51,7 @@ public class BookController {
             @RequestParam int pageSize,
             HttpServletResponse response,
             HttpServletRequest request) {
-        // Check if the user is logged in
-        if (UserContext.getCurrentUsername(request).isEmpty()) {
-            return UserContext.unAuthorizedError(response);
-        }
+
 
         // Validate and sanitize input parameters
         tag = tag == null ? "" : tag.trim();
@@ -75,10 +72,7 @@ public class BookController {
             HttpServletResponse response,
             HttpServletRequest request
     ) {
-        // Check if the user is logged in
-        if (UserContext.getCurrentUsername(request).isEmpty()) {
-            return UserContext.unAuthorizedError(response);
-        }
+
         // get top 10 books
         return bookService.getTop10Books();
     }
@@ -89,10 +83,7 @@ public class BookController {
             HttpServletResponse response,
             HttpServletRequest request
     ) {
-        // Check if the user is logged in
-        if (UserContext.getCurrentUsername(request).isEmpty()) {
-            return UserContext.unAuthorizedError(response);
-        }
+
         // delete book cover
         String filePath = System.getProperty("user.dir") + File.separator + "book-covers" + File.separator + filename;
         File file = new File(filePath);
@@ -183,10 +174,7 @@ public class BookController {
             HttpServletResponse response,
             HttpServletRequest request
     ) {
-        // Check if the user is logged in
-        if (UserContext.getCurrentUsername(request).isEmpty()) {
-            return UserContext.unAuthorizedError(response);
-        }
+
         try{
             // get book by id
             return bookService.getBookById(id);
@@ -207,10 +195,7 @@ public class BookController {
             HttpServletResponse response,
             HttpServletRequest request
     ) {
-        // Check if the user is logged in
-        if (UserContext.getCurrentUsername(request).isEmpty()) {
-            return UserContext.unAuthorizedError(response);
-        }
+
         // delete book by id
         bookService.deleteBook(id);
         return Map.of(
@@ -225,10 +210,7 @@ public class BookController {
             HttpServletResponse response,
             HttpServletRequest request
     ) {
-        // Check if the user is logged in
-        if (UserContext.getCurrentUsername(request).isEmpty()) {
-            return UserContext.unAuthorizedError(response);
-        }
+
         // get all tags
         return bookService.getAllTags();
     }
@@ -239,10 +221,7 @@ public class BookController {
             HttpServletResponse response,
             HttpServletRequest request
     ) {
-        // Check if the user is logged in
-        if (UserContext.getCurrentUsername(request).isEmpty()) {
-            return UserContext.unAuthorizedError(response);
-        }
+
         // insert book
         String title = (String) requestData.get("title");
         String author = (String) requestData.get("author");
@@ -291,10 +270,6 @@ public class BookController {
             HttpServletResponse response,
             HttpServletRequest request
     ) {
-        // Check if the user is logged in
-        if (UserContext.getCurrentUsername(request).isEmpty()) {
-            return UserContext.unAuthorizedError(response);
-        }
         // update book
         String title = (String) requestData.get("title");
         String author = (String) requestData.get("author");
@@ -353,10 +328,7 @@ public class BookController {
             HttpServletResponse response,
             HttpServletRequest request
     ) {
-        // Check if the user is logged in
-        if (UserContext.getCurrentUsername(request).isEmpty()) {
-            return UserContext.unAuthorizedError(response);
-        }
+
         // get book comments by parameters: id, sort, pageIndex, pageSize
         if(id == null){
             response.setStatus(404);
@@ -397,10 +369,7 @@ public class BookController {
             HttpServletResponse response,
             HttpServletRequest request
     ) {
-        // Check if the user is logged in
-        if (UserContext.getCurrentUsername(request).isEmpty()) {
-            return UserContext.unAuthorizedError(response);
-        }
+
         // post book comment
         String content = (String) requestData.get("content");
         String username = UserContext.getCurrentUsername(request);

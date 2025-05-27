@@ -5,7 +5,8 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 src/main/resources/application.properties
-avatars/*
+avatars
+book-covers
 
 ### STS ###
 .apt_generated
