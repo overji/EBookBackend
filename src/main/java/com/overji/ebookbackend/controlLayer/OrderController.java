@@ -8,6 +8,8 @@ import jakarta.websocket.server.PathParam;
 import org.springframework.web.bind.annotation.*;
 import com.overji.ebookbackend.serviceLayer.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -32,16 +34,93 @@ public class OrderController {
 
     @GetMapping("")
     public Object getOrdersByUserId(
+            @PathParam("startTime") String startTime,
+            @PathParam("endTime") String endTime,
+            @PathParam("bookName") String bookName,
             HttpServletRequest request,
             HttpServletResponse response
     ){
-
+        if(startTime == null) startTime = "";
+        if(endTime == null) endTime = "";
+        if(bookName == null) bookName = "";
         try{
             // Get the username from the request
-            String username = UserContext.getCurrentUsername(request);
-            User user = userService.getUserByUsername(username);
-            // get all orders by user id
-            return orderService.getOrdersByUserId(user.getId());
+            if(startTime.isEmpty() && endTime.isEmpty() && bookName.isEmpty()){
+                String username = UserContext.getCurrentUsername(request);
+                User user = userService.getUserByUsername(username);
+                // get all orders by user id
+                return orderService.getOrdersByUserId(user.getId());
+            } else {
+                DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                if(startTime.isEmpty()){
+                    startTime = "1970-01-01 00:00:00"; // default start time
+                }
+
+                if(endTime.isEmpty()){
+                    endTime = "9999-12-31 23:59:59"; // default end time
+                }
+
+                if(bookName.isEmpty()){
+                    bookName = ""; // default book name
+                }
+                // get all orders by user id and filter by time and book name
+                String username = UserContext.getCurrentUsername(request);
+                User user = userService.getUserByUsername(username);
+                return orderService.findByBookNameAndStartTimeAndEndTimeAndUserId(
+                        user.getId(),
+                        bookName,
+                        LocalDateTime.parse(startTime, outputFormatter),
+                        LocalDateTime.parse(endTime, outputFormatter)
+                );
+            }
+        } catch (Exception e){
+            response.setStatus(400);
+            return Map.of(
+                    "ok", false,
+                    "message", e.getMessage(),
+                    "data", Map.of()
+            );
+        }
+    }
+
+    @GetMapping("/admin")
+    public Object getOrdersByAdmin(
+            @PathParam("startTime") String startTime,
+            @PathParam("endTime") String endTime,
+            @PathParam("bookName") String bookName,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ){
+        if(startTime == null) startTime = "";
+        if(endTime == null) endTime = "";
+        if(bookName == null) bookName = "";
+        try{
+            // Get the username from the request
+            if(startTime.isEmpty() && endTime.isEmpty() && bookName.isEmpty()){
+                String username = UserContext.getCurrentUsername(request);
+                // get all orders by user id
+                return orderService.findAllOrders();
+            } else {
+                DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                if(startTime.isEmpty()){
+                    startTime = "1970-01-01 00:00:00"; // default start time
+                }
+
+                if(endTime.isEmpty()){
+                    endTime = "9999-12-31 23:59:59"; // default end time
+                }
+
+                if(bookName.isEmpty()){
+                    bookName = ""; // default book name
+                }
+                // get all orders by user id and filter by time and book name
+                String username = UserContext.getCurrentUsername(request);
+                return orderService.findByBookNameAndStartTimeAndEndTime(
+                        bookName,
+                        LocalDateTime.parse(startTime, outputFormatter),
+                        LocalDateTime.parse(endTime, outputFormatter)
+                );
+            }
         } catch (Exception e){
             response.setStatus(400);
             return Map.of(

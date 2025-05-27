@@ -5,6 +5,7 @@ import com.overji.ebookbackend.entityLayer.*;
 import com.overji.ebookbackend.serviceLayer.OrderService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -82,6 +83,35 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Map<String, Object>> getOrdersByUserId(Long userId) {
         List<Order> orders = orderDAO.findByUserId(userId);
+        return orders.stream().map(Order::toMap).toList();
+    }
+
+    @Override
+    public List<Map<String, Object>> findByBookNameAndStartTimeAndEndTimeAndUserId(Long userId,
+                                                                                   String bookName,
+                                                                                   LocalDateTime startTime,
+                                                                                   LocalDateTime endTime
+    ){
+        List<Order> orders = orderDAO.findByBookNameAndStartTimeAndEndTimeAndUserId(bookName,startTime,endTime,userId);
+        List<Map<String, Object>> ans;
+        ans = orders.stream().map(Order::toMap).toList();
+        return ans;
+    }
+
+    @Override
+    public List<Map<String, Object>> findByBookNameAndStartTimeAndEndTime(String bookName,
+                                                                          LocalDateTime startTime,
+                                                                          LocalDateTime endTime
+    ){
+        List<Order> orders = orderDAO.findByBookNameAndStartTimeAndEndTime(bookName,startTime,endTime);
+        List<Map<String, Object>> ans;
+        ans = orders.stream().map(Order::toMap).toList();
+        return ans;
+    }
+
+    @Override
+    public List<Map<String, Object>> findAllOrders() {
+        List<Order> orders = orderDAO.findAllOrders();
         return orders.stream().map(Order::toMap).toList();
     }
 
