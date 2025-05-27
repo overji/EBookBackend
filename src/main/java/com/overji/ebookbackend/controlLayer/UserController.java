@@ -32,10 +32,40 @@ public class UserController {
     }
 
     // can be ignored
-    @GetMapping("/test")
-    public List<Map<String, Object>> getAllUsers() {
+    @GetMapping("/admin")
+    public Map<String, Object> getUsers(
+            @RequestParam int pageIndex,
+            @RequestParam int pageSize,
+            HttpServletResponse response,
+            HttpServletRequest request) {
         List<User> users = userService.getAllUsers();
-        return users.stream().map(User::toMap).toList();
+        long len = (long) users.size();
+        return Map.of("items",users.stream().map(User::toMap).toList(),
+                      "total", Math.ceil((double) len / pageSize)
+                );
+    }
+
+    @PutMapping("/admin/{id}")
+    public Map<String, Object> banUser(
+            @PathVariable Long id,
+            @RequestParam boolean isDisabled,
+            HttpServletResponse response
+    ) {
+        try {
+            userService.updateDisabledById(id, isDisabled);
+            return Map.of(
+                    "message", "User status updated successfully",
+                    "ok", true,
+                    "data", Map.of()
+            );
+        } catch (IllegalAccessError | RuntimeException e) {
+            logger.error("Failed to update user status: {}", e.getMessage());
+            response.setStatus(500);
+            return Map.of(
+                    "status", 500,
+                    "message", "Failed to update user status: " + e.getMessage()
+            );
+        }
     }
 
     @PostMapping("/register")

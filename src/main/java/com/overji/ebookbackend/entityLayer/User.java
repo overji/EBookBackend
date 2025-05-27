@@ -170,7 +170,8 @@ public class User {
                 "introduction", introduction,
                 "avatar", avatar,
                 "createdAt", createdAt,
-                "privilege", this.getUserPrivilege()
+                "privilege", this.getUserPrivilege(),
+                "isDisabled", this.getIsDisabled()
         );
     }
 

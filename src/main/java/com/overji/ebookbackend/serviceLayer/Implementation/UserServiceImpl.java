@@ -106,4 +106,13 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Failed to update avatar: " + e.getMessage(), e);
         }
     }
+
+    @Override
+    public void updateDisabledById(Long id, boolean isDisabled){
+        try {
+            userDAO.updateDisabledById(id, isDisabled);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update disabled status: " + e.getMessage(), e);
+        }
+    }
 }

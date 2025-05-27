@@ -42,6 +42,18 @@ public class AuthController {
         String password = requestData.get("password");
 
         try {
+
+
+            // 判断是否是管理员
+            User user = userService.getUserByUsername(username);
+            if(user.getIsDisabled()) {
+                return Map.of(
+                        "message", "用户已被禁用",
+                        "ok", false,
+                        "data", Map.of(),
+                        "isAdmin", false
+                );
+            }
             // 使用 AuthenticationManager 进行认证
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
@@ -55,9 +67,6 @@ public class AuthController {
             HttpSession session = request.getSession(true);
             session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, securityContext);
             session.setAttribute("username", username);
-
-            // 判断是否是管理员
-            User user = userService.getUserByUsername(username);
             boolean isAdmin = user.getAuth().getUserPrivilege() == 1;
             session.setAttribute("isAdmin", isAdmin);
 
@@ -70,7 +79,7 @@ public class AuthController {
         } catch (AuthenticationException e) {
             e.printStackTrace();
             return Map.of(
-                    "message", "fail",
+                    "message", e.getMessage(),
                     "ok", false,
                     "data", Map.of(),
                     "isAdmin", false

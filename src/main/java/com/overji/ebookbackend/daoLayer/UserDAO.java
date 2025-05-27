@@ -19,4 +19,6 @@ public interface UserDAO {
     void updateIntroductionByUsername(String username, String introduction);
 
     void updateAvatarByUsername(String username, String avatar);
+
+    void updateDisabledById(Long id, boolean isDisabled);
 }

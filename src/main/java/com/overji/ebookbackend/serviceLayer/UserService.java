@@ -20,4 +20,6 @@ public interface UserService {
     void updateIntroductionByUsername(String username, String introduction);
 
     void updateAvatarByUsername(String username, String avatarPath);
+
+    void updateDisabledById(Long id, boolean isDisabled);
 }

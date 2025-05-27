@@ -50,4 +50,9 @@ public class UserDAOImpl implements UserDAO {
     public void updateAvatarByUsername(String username, String avatar) {
         userRepository.updateAvatarByUsername(username, avatar);
     }
+
+    @Override
+    public void updateDisabledById(Long id, boolean isDisabled){
+        userRepository.updateDisabledById(id, isDisabled);
+    }
 }
