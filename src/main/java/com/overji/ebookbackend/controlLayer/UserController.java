@@ -97,6 +97,7 @@ public class UserController {
         user.setIntroduction(introduction);
         user.setNickname(nickname);
         user.setBalance(balance);
+        user.setUserPrivilege(0L);
         try {
             userService.addUser(user);
             // 假设保存成功，返回一个响应

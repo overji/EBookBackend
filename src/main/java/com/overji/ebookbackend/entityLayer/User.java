@@ -34,10 +34,10 @@ public class User {
 
     @Column
     @Lob
-    private String avatar;
+    private String avatar = "";
 
     // User's privilege level，0为普通用户，1为普通管理员，2为超级管理员
-    @Column(nullable = false)
+    @Column(nullable = false,columnDefinition = "INT DEFAULT 0")
     private Long userPrivilege = 0L;
 
     // 是否被禁用
