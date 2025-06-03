@@ -67,7 +67,7 @@ public class AuthController {
             HttpSession session = request.getSession(true);
             session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, securityContext);
             session.setAttribute("username", username);
-            boolean isAdmin = user.getAuth().getUserPrivilege() == 1;
+            boolean isAdmin = user.getUserPrivilege() == 1;
             session.setAttribute("isAdmin", isAdmin);
 
             return Map.of(

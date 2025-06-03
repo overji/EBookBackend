@@ -36,6 +36,14 @@ public class User {
     @Lob
     private String avatar;
 
+    // User's privilege level，0为普通用户，1为普通管理员，2为超级管理员
+    @Column(nullable = false)
+    private Long userPrivilege = 0L;
+
+    // 是否被禁用
+    @Column(nullable = false)
+    private Boolean isDisabled = false;
+
     @CreationTimestamp
     @Column(nullable = false)
     private Timestamp createdAt;
@@ -80,7 +88,6 @@ public class User {
     }
 
     public void setPassword(String password) {
-
         this.auth.setPassword(password);
     }
 
@@ -145,19 +152,19 @@ public class User {
     }
 
     public Long getUserPrivilege() {
-        return this.auth.getUserPrivilege();
+        return this.userPrivilege;
     }
 
     public void setUserPrivilege(Long userPrivilege) {
-        this.auth.setUserPrivilege(userPrivilege);
+        this.userPrivilege = userPrivilege;
     }
 
     public Boolean getIsDisabled() {
-        return this.auth.getIsDisabled();
+        return this.isDisabled;
     }
 
     public void setIsDisabled(Boolean isDisabled) {
-        this.auth.setIsDisabled(isDisabled);
+        this.isDisabled = true;
     }
 
     public Map<String, Object> toMap() {
@@ -170,8 +177,8 @@ public class User {
                 "introduction", introduction,
                 "avatar", avatar,
                 "createdAt", createdAt,
-                "privilege", this.getUserPrivilege(),
-                "isDisabled", this.getIsDisabled()
+                "privilege", userPrivilege,
+                "isDisabled", isDisabled
         );
     }
 

@@ -188,4 +188,36 @@ public class OrderController {
             );
         }
     }
+
+    @GetMapping("/statistics")
+    public Object getOrdersByAdmin(
+            @PathParam("startTime") String startTime,
+            @PathParam("endTime") String endTime,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ){
+        if(startTime == null) startTime = "";
+        if(endTime == null) endTime = "";
+        try{
+            DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            if(startTime.isEmpty()){
+                startTime = "1970-01-01 00:00:00"; // default start time
+            }
+
+            if(endTime.isEmpty()){
+                endTime = "9999-12-31 23:59:59"; // default end time
+            }
+            return orderService.getUserStatistics(
+                    LocalDateTime.parse(startTime, outputFormatter),
+                    LocalDateTime.parse(endTime, outputFormatter)
+            );
+        } catch (Exception e){
+            response.setStatus(400);
+            return Map.of(
+                    "ok", false,
+                    "message", e.getMessage(),
+                    "data", Map.of()
+            );
+        }
+    }
 }

@@ -118,4 +118,14 @@ public class Order {
         );
     }
 
+    public Map<String,Object> adminToMap(){
+        return Map.of(
+                "id", id,
+                "items", items.stream().map(OrderItem::toMap).toList(),
+                "address", address,
+                "tel", tel,
+                "receiver", receiver,
+                "createdAt", createdAt
+        );
+    }
 }

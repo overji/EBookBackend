@@ -3,11 +3,14 @@ package com.overji.ebookbackend.serviceLayer.Implementation;
 import com.overji.ebookbackend.daoLayer.*;
 import com.overji.ebookbackend.entityLayer.*;
 import com.overji.ebookbackend.serviceLayer.OrderService;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -50,7 +53,7 @@ public class OrderServiceImpl implements OrderService {
         for (Long itemId : itemIds) {
             Cart cart = cartDAO.findByUserIdAndUserCartId(user.getId(), itemId);
             Book book = bookDAO.findById(cart.getBook().getId()).orElseThrow(() -> new RuntimeException("Book not found"));
-            if(book.getStock() < cart.getNumber()) {
+            if (book.getStock() < cart.getNumber()) {
                 orderDAO.delete(order);
                 return Map.of(
                         "message", "库存不足",
@@ -91,8 +94,8 @@ public class OrderServiceImpl implements OrderService {
                                                                                    String bookName,
                                                                                    LocalDateTime startTime,
                                                                                    LocalDateTime endTime
-    ){
-        List<Order> orders = orderDAO.findByBookNameAndStartTimeAndEndTimeAndUserId(bookName,startTime,endTime,userId);
+    ) {
+        List<Order> orders = orderDAO.findByBookNameAndStartTimeAndEndTimeAndUserId(bookName, startTime, endTime, userId);
         List<Map<String, Object>> ans;
         ans = orders.stream().map(Order::toMap).toList();
         return ans;
@@ -102,17 +105,17 @@ public class OrderServiceImpl implements OrderService {
     public List<Map<String, Object>> findByBookNameAndStartTimeAndEndTime(String bookName,
                                                                           LocalDateTime startTime,
                                                                           LocalDateTime endTime
-    ){
-        List<Order> orders = orderDAO.findByBookNameAndStartTimeAndEndTime(bookName,startTime,endTime);
+    ) {
+        List<Order> orders = orderDAO.findByBookNameAndStartTimeAndEndTime(bookName, startTime, endTime);
         List<Map<String, Object>> ans;
-        ans = orders.stream().map(Order::toMap).toList();
+        ans = orders.stream().map(Order::adminToMap).toList();
         return ans;
     }
 
     @Override
     public List<Map<String, Object>> findAllOrders() {
         List<Order> orders = orderDAO.findAllOrders();
-        return orders.stream().map(Order::toMap).toList();
+        return orders.stream().map(Order::adminToMap).toList();
     }
 
     @Override
@@ -156,5 +159,28 @@ public class OrderServiceImpl implements OrderService {
                 "ok", true,
                 "data", Map.of()
         );
+    }
+
+    @Override
+    public Object getUserStatistics(LocalDateTime startTime,
+                                    LocalDateTime endTime) {
+        List<Order> orders = orderDAO.findByBookNameAndStartTimeAndEndTime("", startTime, endTime);
+        Map<User, Long> userStatistics = new HashMap<>();
+        for (Order order : orders) {
+            User user = order.getUser();
+            Long totalMoney = userStatistics.getOrDefault(user, 0L);
+            totalMoney += order.getItems().stream()
+                    .mapToLong(item -> item.getBook().getPrice() * item.getNumber())
+                    .sum();
+            userStatistics.put(user, totalMoney);
+        }
+        //返回用户信息以及对应的总消费金额
+        return userStatistics.entrySet().stream()
+                .map(entry -> {
+                    Map<String, Object> userMap = new HashMap<>(entry.getKey().toMap());
+                    userMap.put("totalCost", entry.getValue());
+                    return userMap;
+                })
+                .collect(Collectors.toList());
     }
 }

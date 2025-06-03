@@ -24,4 +24,7 @@ public interface OrderService {
     List<Map<String, Object>> findAllOrders();
 
     Map<String, Object> addOneOrder(String address, String tel, String receiver, Long bookId, Long number, User user);
+
+    Object getUserStatistics(LocalDateTime startTime,
+                             LocalDateTime endTime);
 }

@@ -30,6 +30,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Transactional
     @Modifying
-    @Query("UPDATE User u SET u.auth.isDisabled= ?2 WHERE u.id = ?1")
+    @Query("UPDATE User u SET u.isDisabled= ?2 WHERE u.id = ?1")
     void updateDisabledById(Long id, boolean isDisabled);
 }
