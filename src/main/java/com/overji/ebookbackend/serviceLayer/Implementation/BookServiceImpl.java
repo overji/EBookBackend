@@ -77,7 +77,6 @@ public class BookServiceImpl implements BookService {
             BookTag bookTag = new BookTag();
             bookTag.setName(tag);
             bookTag.setBook(book);
-            bookTag.setBookTagId(curIndex++);
             bookTagsDAO.save(bookTag);
             book.addTag(bookTag);
         }
@@ -115,7 +114,6 @@ public class BookServiceImpl implements BookService {
             BookTag bookTag = new BookTag();
             bookTag.setName(tagName);
             bookTag.setBook(book);
-            bookTag.setBookTagId(curIndex++);
             book.addTag(bookTag);
             bookTagsDAO.save(bookTag);
         }

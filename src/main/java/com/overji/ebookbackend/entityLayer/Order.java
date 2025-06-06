@@ -15,9 +15,6 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long userOrderId;
-
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -45,14 +42,6 @@ public class Order {
 
     public Long getId() {
         return id;
-    }
-
-    public void setUserOrderId(Long userOrderId) {
-        this.userOrderId = userOrderId;
-    }
-
-    public Long getUserOrderId() {
-        return userOrderId;
     }
 
     public void setUser(User user) {
@@ -109,7 +98,7 @@ public class Order {
 
     public Map<String, Object> toMap() {
         return Map.of(
-                "id", userOrderId,
+                "id", id,
                 "items", items.stream().map(OrderItem::toMap).toList(),
                 "address", address,
                 "tel", tel,

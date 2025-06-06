@@ -27,7 +27,7 @@ public class CartServiceImpl implements CartService {
     public List<Map<String, Object>> getCartItems(User user) {
         List<Cart> cartItems = cartDAO.findByUserId(user.getId());
         return cartItems.stream().map(cart -> Map.of(
-                "id", cart.getUserCartId(),
+                "id", cart.getId(),
                 "book", cart.getBook().toMap(),
                 "number", cart.getNumber()
         )).toList();
@@ -47,7 +47,6 @@ public class CartServiceImpl implements CartService {
         cart.setUser(user);
         cart.setBook(bookDAO.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found")));
         cart.setNumber(number);
-        cart.setUserCartId(user.getCartId());
         cartDAO.save(cart);
         return Map.of(
                 "message", "Book added to cart successfully",

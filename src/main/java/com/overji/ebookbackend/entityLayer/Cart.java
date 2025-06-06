@@ -9,9 +9,6 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long userCartId;
-
     @ManyToOne
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
@@ -29,14 +26,6 @@ public class Cart {
 
     public Long getId() {
         return id;
-    }
-
-    public void setUserCartId(Long userCartId) {
-        this.userCartId = userCartId;
-    }
-
-    public Long getUserCartId() {
-        return userCartId;
     }
 
     public void setUser(User user) {

@@ -42,8 +42,6 @@ public class AuthController {
         String password = requestData.get("password");
 
         try {
-
-
             // 判断是否是管理员
             User user = userService.getUserByUsername(username);
             if(user.getIsDisabled()) {

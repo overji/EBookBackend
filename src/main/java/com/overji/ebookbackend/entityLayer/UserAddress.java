@@ -15,9 +15,6 @@ public class UserAddress {
     @JoinColumn(name = "uid", nullable = false)
     private User user;
 
-    @Column(nullable = false)
-    private Long userAddrId;
-
     @Lob
     @Column(nullable = false)
     private String address;
@@ -42,12 +39,6 @@ public class UserAddress {
     public User getUser() {
         return user;
     }
-    public Long getUserAddrId() {
-        return userAddrId;
-    }
-    public void setUserAddrId(Long userAddrId) {
-        this.userAddrId = userAddrId;
-    }
     public String getAddress() {
         return address;
     }
@@ -69,7 +60,7 @@ public class UserAddress {
 
     public Map<String, Object> toMap() {
         return Map.of(
-                "id", userAddrId,
+                "id", id,
                 "address", address,
                 "tel", phone,
                 "receiver", receiver

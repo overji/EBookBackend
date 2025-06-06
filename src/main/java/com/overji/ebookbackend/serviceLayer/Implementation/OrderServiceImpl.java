@@ -48,7 +48,6 @@ public class OrderServiceImpl implements OrderService {
         order.setAddress(address);
         order.setTel(tel);
         order.setReceiver(receiver);
-        order.setUserOrderId(user.getOrderId());
         orderDAO.save(order);
         for (Long itemId : itemIds) {
             Cart cart = cartDAO.findByUserIdAndUserCartId(user.getId(), itemId);
@@ -141,7 +140,6 @@ public class OrderServiceImpl implements OrderService {
         order.setAddress(address);
         order.setTel(tel);
         order.setReceiver(receiver);
-        order.setUserOrderId(user.getOrderId());
         orderDAO.save(order);
         OrderItem orderItem = new OrderItem();
         orderItem.setBook(book);

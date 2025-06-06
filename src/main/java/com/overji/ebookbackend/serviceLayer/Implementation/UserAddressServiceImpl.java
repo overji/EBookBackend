@@ -24,9 +24,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     @Transactional
     public UserAddress saveUserAddress(String username, String address, String phone, String receiver) {
         Long userId = userService.getUserByUsername(username).getId();
-        Long maxUserAddrId = userAddressDAO.findMaxUserAddrIdByUserId(userId);
         UserAddress userAddress = new UserAddress();
-        userAddress.setUserAddrId(maxUserAddrId == null ? 0 : maxUserAddrId + 1);
         userAddress.setUser(userService.getUserByUsername(username));
         userAddress.setAddress(address);
         userAddress.setPhone(phone);

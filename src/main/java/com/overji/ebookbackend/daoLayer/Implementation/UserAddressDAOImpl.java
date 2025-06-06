@@ -21,11 +21,6 @@ public class UserAddressDAOImpl implements UserAddressDAO {
     }
 
     @Override
-    public Long findMaxUserAddrIdByUserId(Long userId) {
-        return userAddressRepository.findMaxUserAddrIdByUserId(userId);
-    }
-
-    @Override
     public UserAddress findByUserAddrIdAndUserId(Long userAddrId, Long userId) {
         return userAddressRepository.findByUserAddrIdAndUserId(userAddrId, userId);
     }

@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -167,6 +164,30 @@ public class User {
         this.isDisabled = true;
     }
 
+    public List<Cart> getCartItems() {
+        return cartItems;
+    }
+
+    public void setCartItems(List<Cart> cartItems) {
+        this.cartItems = cartItems;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
+
+    public List<Comment> getLikedComments() {
+        return likedComments;
+    }
+
+    public void setLikedComments(List<Comment> likedComments) {
+        this.likedComments = likedComments;
+    }
+
     public Map<String, Object> toMap() {
         return Map.of(
                 "id", id,
@@ -180,37 +201,5 @@ public class User {
                 "privilege", userPrivilege,
                 "isDisabled", isDisabled
         );
-    }
-
-    public Long getCartId() {
-        List<Boolean> cartIds = new ArrayList<>(Collections.nCopies(this.cartItems.size() + 1, false));
-        for (Cart cart : this.cartItems) {
-            if (cart.getUserCartId() >= cartIds.size()) {
-                continue;
-            }
-            cartIds.set(cart.getUserCartId().intValue(), true);
-        }
-        for (int i = 0; i < cartIds.size(); i++) {
-            if (!cartIds.get(i)) {
-                return (long) i;
-            }
-        }
-        return -1L;
-    }
-
-    public Long getOrderId() {
-        List<Boolean> orderIds = new ArrayList<>(Collections.nCopies(this.orders.size() + 1, false));
-        for (Order order : this.orders) {
-            if (order.getUserOrderId() >= orderIds.size()) {
-                continue;
-            }
-            orderIds.set(order.getUserOrderId().intValue(), true);
-        }
-        for (int i = 0; i < orderIds.size(); i++) {
-            if (!orderIds.get(i)) {
-                return (long) i;
-            }
-        }
-        return -1L;
     }
 }

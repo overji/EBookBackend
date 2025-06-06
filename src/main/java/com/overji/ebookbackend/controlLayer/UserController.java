@@ -40,8 +40,12 @@ public class UserController {
             HttpServletRequest request) {
         List<User> users = userService.getAllUsers();
         long len = (long) users.size();
-        return Map.of("items",users.stream().map(User::toMap).toList(),
-                      "total", Math.ceil((double) len / pageSize)
+        List<User> paginatedUsers = users.stream()
+                .skip((long) pageIndex * pageSize)
+                .limit(pageSize)
+                .toList();
+        return Map.of("items",paginatedUsers.stream().map(User::toMap).toList(),
+                      "total", (long)Math.ceil((double) len / pageSize)
                 );
     }
 
