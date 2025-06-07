@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Map;
 
 /*
-* this controller is used to handle order related requests
-* it includes:
-* 1. get all orders by user id
-* 2. add order by book id
-* 3. add order by order id
+ * this controller is used to handle order related requests
+ * it includes:
+ * 1. get all orders by user id
+ * 2. add order by book id
+ * 3. add order by order id
  */
 @RestController
 @RequestMapping("/api/order")
@@ -26,6 +26,7 @@ public class OrderController {
     private final OrderService orderService;
     private final UserService userService;
     private final BookService bookService;
+
     public OrderController(OrderService orderService, UserService userService, BookService bookService) {
         this.orderService = orderService;
         this.userService = userService;
@@ -37,30 +38,34 @@ public class OrderController {
             @PathParam("startTime") String startTime,
             @PathParam("endTime") String endTime,
             @PathParam("bookName") String bookName,
+            @PathParam("pageIndex") Integer pageIndex,
+            @PathParam("pageSize") Integer pageSize,
             HttpServletRequest request,
             HttpServletResponse response
-    ){
-        if(startTime == null) startTime = "";
-        if(endTime == null) endTime = "";
-        if(bookName == null) bookName = "";
-        try{
+    ) {
+        if (startTime == null) startTime = "";
+        if (endTime == null) endTime = "";
+        if (bookName == null) bookName = "";
+        try {
             // Get the username from the request
-            if(startTime.isEmpty() && endTime.isEmpty() && bookName.isEmpty()){
+            if (startTime.isEmpty() && endTime.isEmpty() && bookName.isEmpty()) {
                 String username = UserContext.getCurrentUsername(request);
                 User user = userService.getUserByUsername(username);
                 // get all orders by user id
-                return orderService.getOrdersByUserId(user.getId());
+                return orderService.getOrdersByUserId(user.getId(),
+                        pageIndex == null ? 0 : pageIndex,
+                        pageSize == null ? 8 : pageSize);
             } else {
                 DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                if(startTime.isEmpty()){
+                if (startTime.isEmpty()) {
                     startTime = "1970-01-01 00:00:00"; // default start time
                 }
 
-                if(endTime.isEmpty()){
+                if (endTime.isEmpty()) {
                     endTime = "9999-12-31 23:59:59"; // default end time
                 }
 
-                if(bookName.isEmpty()){
+                if (bookName.isEmpty()) {
                     bookName = ""; // default book name
                 }
                 // get all orders by user id and filter by time and book name
@@ -70,10 +75,12 @@ public class OrderController {
                         user.getId(),
                         bookName,
                         LocalDateTime.parse(startTime, outputFormatter),
-                        LocalDateTime.parse(endTime, outputFormatter)
+                        LocalDateTime.parse(endTime, outputFormatter),
+                        pageIndex == null ? 0 : pageIndex,
+                        pageSize == null ? 8 : pageSize
                 );
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             response.setStatus(400);
             return Map.of(
                     "ok", false,
@@ -88,29 +95,32 @@ public class OrderController {
             @PathParam("startTime") String startTime,
             @PathParam("endTime") String endTime,
             @PathParam("bookName") String bookName,
+            @PathParam("pageIndex") Integer pageIndex,
+            @PathParam("pageSize") Integer pageSize,
             HttpServletRequest request,
             HttpServletResponse response
-    ){
-        if(startTime == null) startTime = "";
-        if(endTime == null) endTime = "";
-        if(bookName == null) bookName = "";
-        try{
+    ) {
+        if (startTime == null) startTime = "";
+        if (endTime == null) endTime = "";
+        if (bookName == null) bookName = "";
+        try {
             // Get the username from the request
-            if(startTime.isEmpty() && endTime.isEmpty() && bookName.isEmpty()){
+            if (startTime.isEmpty() && endTime.isEmpty() && bookName.isEmpty()) {
                 String username = UserContext.getCurrentUsername(request);
                 // get all orders by user id
-                return orderService.findAllOrders();
+                return orderService.findAllOrders(pageIndex == null ? 0 : pageIndex,
+                        pageSize == null ? 8 : pageSize);
             } else {
                 DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                if(startTime.isEmpty()){
+                if (startTime.isEmpty()) {
                     startTime = "1970-01-01 00:00:00"; // default start time
                 }
 
-                if(endTime.isEmpty()){
+                if (endTime.isEmpty()) {
                     endTime = "9999-12-31 23:59:59"; // default end time
                 }
 
-                if(bookName.isEmpty()){
+                if (bookName.isEmpty()) {
                     bookName = ""; // default book name
                 }
                 // get all orders by user id and filter by time and book name
@@ -118,10 +128,12 @@ public class OrderController {
                 return orderService.findByBookNameAndStartTimeAndEndTime(
                         bookName,
                         LocalDateTime.parse(startTime, outputFormatter),
-                        LocalDateTime.parse(endTime, outputFormatter)
+                        LocalDateTime.parse(endTime, outputFormatter),
+                        pageIndex == null ? 0 : pageIndex,
+                        pageSize == null ? 8 : pageSize
                 );
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             response.setStatus(400);
             return Map.of(
                     "ok", false,
@@ -134,23 +146,23 @@ public class OrderController {
     // this api is used for directly purchase a book with certain numbers
     // in the book page, without adding it to the cart
     @PostMapping("/{bookId}")
-    public Map<String,Object> addOrderByBookId(
+    public Map<String, Object> addOrderByBookId(
             @PathVariable Long bookId,
             @PathParam("number") Long number,
-            @RequestBody Map<String,Object> body,
+            @RequestBody Map<String, Object> body,
             HttpServletRequest request,
             HttpServletResponse response
-    ){
+    ) {
 
-        try{
+        try {
             // add one order by book id
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);
             String address = body.get("address").toString();
             String tel = body.get("tel").toString();
             String receiver = body.get("receiver").toString();
-            return orderService.addOneOrder(address,tel,receiver,bookId,number,user);
-        } catch (Exception e){
+            return orderService.addOneOrder(address, tel, receiver, bookId, number, user);
+        } catch (Exception e) {
             response.setStatus(400);
             return Map.of(
                     "ok", false,
@@ -162,13 +174,13 @@ public class OrderController {
 
     //this api is used for purchase in the cart
     @PostMapping("")
-    public Map<String,Object> addOrder(
-            @RequestBody Map<String,Object> body,
+    public Map<String, Object> addOrder(
+            @RequestBody Map<String, Object> body,
             HttpServletRequest request,
             HttpServletResponse response
-    ){
+    ) {
 
-        try{
+        try {
             String username = UserContext.getCurrentUsername(request);
             User user = userService.getUserByUsername(username);
             String address = body.get("address").toString();
@@ -178,8 +190,8 @@ public class OrderController {
                     .stream()
                     .map(Integer::longValue)
                     .toList();
-            return orderService.addOrder(address,tel,receiver,itemIds,user);
-        } catch (Exception e){
+            return orderService.addOrder(address, tel, receiver, itemIds, user);
+        } catch (Exception e) {
             response.setStatus(400);
             return Map.of(
                     "ok", false,
@@ -195,23 +207,23 @@ public class OrderController {
             @PathParam("endTime") String endTime,
             HttpServletRequest request,
             HttpServletResponse response
-    ){
-        if(startTime == null) startTime = "";
-        if(endTime == null) endTime = "";
-        try{
+    ) {
+        if (startTime == null) startTime = "";
+        if (endTime == null) endTime = "";
+        try {
             DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            if(startTime.isEmpty()){
+            if (startTime.isEmpty()) {
                 startTime = "1970-01-01 00:00:00"; // default start time
             }
 
-            if(endTime.isEmpty()){
+            if (endTime.isEmpty()) {
                 endTime = "9999-12-31 23:59:59"; // default end time
             }
             return orderService.getUserStatistics(
                     LocalDateTime.parse(startTime, outputFormatter),
                     LocalDateTime.parse(endTime, outputFormatter)
             );
-        } catch (Exception e){
+        } catch (Exception e) {
             response.setStatus(400);
             return Map.of(
                     "ok", false,

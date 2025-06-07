@@ -9,19 +9,24 @@ import java.util.Map;
 public interface OrderService {
     Map<String, Object> addOrder(String address, String tel, String receiver, List<Long> itemIds, User user);
 
-    List<Map<String, Object>> getOrdersByUserId(Long userId);
+    Map<String, Object> getOrdersByUserId(Long userId,int pageIndex, int pageSize);
 
-    List<Map<String, Object>> findByBookNameAndStartTimeAndEndTimeAndUserId(Long userId,
+    Map<String, Object> findByBookNameAndStartTimeAndEndTimeAndUserId(Long userId,
                                                                             String bookName,
                                                                             LocalDateTime startTime,
-                                                                            LocalDateTime endTime
-                                                                            );
-    List<Map<String, Object>> findByBookNameAndStartTimeAndEndTime(String bookName,
-                                                                   LocalDateTime startTime,
-                                                                   LocalDateTime endTime
-                                                                    );
+                                                                            LocalDateTime endTime,
+                                                                            int pageIndex,
+                                                                            int pageSize
+    );
 
-    List<Map<String, Object>> findAllOrders();
+    Map<String, Object> findByBookNameAndStartTimeAndEndTime(String bookName,
+                                                                   LocalDateTime startTime,
+                                                                   LocalDateTime endTime,
+                                                                   int pageIndex,
+                                                                   int pageSize
+    );
+
+    Map<String, Object> findAllOrders(int pageIndex, int pageSize);
 
     Map<String, Object> addOneOrder(String address, String tel, String receiver, Long bookId, Long number, User user);
 

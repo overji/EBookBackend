@@ -3,6 +3,8 @@ package com.overji.ebookbackend.daoLayer.Implementation;
 import com.overji.ebookbackend.daoLayer.OrderDAO;
 import com.overji.ebookbackend.entityLayer.Order;
 import com.overji.ebookbackend.repositoryLayer.OrderRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -17,8 +19,8 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public List<Order> findByUserId(Long userId) {
-        return orderRepository.findByUserId(userId);
+    public Page<Order> findByUserId(Long userId, Pageable pageable) {
+        return orderRepository.findByUserId(userId, pageable);
     }
 
     @Override
@@ -32,17 +34,17 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public List<Order> findByBookNameAndStartTimeAndEndTime(String bookName, LocalDateTime startTime, LocalDateTime endTime){
-        return orderRepository.findByBookNameAndStartTimeAndEndTime(bookName,startTime,endTime);
+    public Page<Order> findByBookNameAndStartTimeAndEndTime(String bookName, LocalDateTime startTime, LocalDateTime endTime, Pageable pageable) {
+        return orderRepository.findByBookNameAndStartTimeAndEndTime(bookName, startTime, endTime, pageable);
     }
 
     @Override
-    public List<Order> findByBookNameAndStartTimeAndEndTimeAndUserId(String bookName, LocalDateTime startTime, LocalDateTime endTime, Long UserId){
-        return orderRepository.findByBookNameAndStartTimeAndEndTimeAndUserId(bookName,startTime,endTime,UserId);
+    public Page<Order> findByBookNameAndStartTimeAndEndTimeAndUserId(String bookName, LocalDateTime startTime, LocalDateTime endTime, Long UserId, Pageable pageable) {
+        return orderRepository.findByBookNameAndStartTimeAndEndTimeAndUserId(bookName, startTime, endTime, UserId, pageable);
     }
 
     @Override
-    public List<Order> findAllOrders(){
-        return orderRepository.findAll();
+    public Page<Order> findAllOrders(Pageable pageable) {
+        return orderRepository.findAll(pageable);
     }
 }

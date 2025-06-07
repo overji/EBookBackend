@@ -4,6 +4,8 @@ import com.overji.ebookbackend.daoLayer.BookDAO;
 import com.overji.ebookbackend.entityLayer.Book;
 import com.overji.ebookbackend.entityLayer.Comment;
 import com.overji.ebookbackend.repositoryLayer.BookRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,38 +20,38 @@ public class BookDAOImpl implements BookDAO {
     }
 
     @Override
-    public List<Book> findAllByTagAndTitle(String tag, String keyword) {
-        return bookRepository.findAllByTagAndTitle(tag, keyword);
+    public Page<Book> findAllByTagAndTitle(String tag, String keyword, Pageable pageable) {
+        return bookRepository.findAllByTagAndTitle(tag, keyword, pageable);
+    }
+
+    @Override
+    public Page<Book> findByTitleContaining(String keyword, Pageable pageable) {
+        return bookRepository.findByTitleContaining(keyword, pageable);
+    }
+
+    @Override
+    public Page<Book> findByTagContaining(String tag, Pageable pageable) {
+        return bookRepository.findByTagContaining(tag, pageable);
+    }
+
+    @Override
+    public Page<Book> findAll(Pageable pageable) {
+        return bookRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Comment> getBookCommentsByTime(Long bookId, Pageable pageable) {
+        return bookRepository.getBookCommentsByTime(bookId, pageable);
+    }
+
+    @Override
+    public Page<Comment> getBookCommentsByLikes(Long bookId, Pageable pageable) {
+        return bookRepository.getBookCommentsByLikes(bookId, pageable);
     }
 
     @Override
     public List<Book> findTop10Books() {
         return bookRepository.findTop10Books();
-    }
-
-    @Override
-    public List<Book> findByTitleContaining(String keyword) {
-        return bookRepository.findByTitleContaining(keyword);
-    }
-
-    @Override
-    public List<Book> findByTagContaining(String tag) {
-        return bookRepository.findByTagContaining(tag);
-    }
-
-    @Override
-    public List<Comment> getBookCommentsByTime(Long bookId) {
-        return bookRepository.getBookCommentsByTime(bookId);
-    }
-
-    @Override
-    public List<Comment> getBookCommentsByLikes(Long bookId) {
-        return bookRepository.getBookCommentsByLikes(bookId);
-    }
-
-    @Override
-    public List<Book> findAll() {
-        return bookRepository.findAll();
     }
 
     @Override

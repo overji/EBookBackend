@@ -8,6 +8,8 @@ import com.overji.ebookbackend.entityLayer.Comment;
 import com.overji.ebookbackend.entityLayer.User;
 import com.overji.ebookbackend.serviceLayer.BookService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,21 +31,19 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Map<String, Object> getBooks(String tag, String keyword, int pageIndex, int pageSize) {
-        List<Book> books = new ArrayList<>();
+        Page<Book> books = null;
+        Pageable pageable = Pageable.ofSize(pageSize).withPage(pageIndex);
         if (Objects.equals(tag, "") && Objects.equals(keyword, "")) {
-            books = bookDAO.findAll();
+            books = bookDAO.findAll(pageable);
         } else if (!Objects.equals(tag, "") && Objects.equals(keyword, "")) {
-            books = bookDAO.findByTagContaining(tag);
+            books = bookDAO.findByTagContaining(tag,pageable);
         } else if (Objects.equals(tag, "")) {
-            books = bookDAO.findByTitleContaining(keyword);
+            books = bookDAO.findByTitleContaining(keyword,pageable);
         } else {
-            books = bookDAO.findAllByTagAndTitle(tag, keyword);
+            books = bookDAO.findAllByTagAndTitle(tag, keyword,pageable);
         }
-        int totalBooks = books.size();
-        int start = pageIndex * pageSize;
-        int end = Math.min(start + pageSize, totalBooks);
-        List<Book> paginatedBooks = books.subList(start, end);
-        int totalPages = (int) Math.ceil((double) totalBooks / pageSize);
+        List<Book> paginatedBooks = books.getContent();
+        int totalPages = books.getTotalPages();
         return Map.of(
                 "total", totalPages,
                 "items", paginatedBooks.stream().map(
@@ -170,26 +170,18 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Map<String, Object> getBookComments(Long bookId, String orderBy, int pageIndex, int pageSize, User user) {
-        List<Map<String, Object>> comments;
+        Page<Comment> comments = null;
+        Pageable pageable = Pageable.ofSize(pageSize).withPage(pageIndex);
         if (Objects.equals(orderBy, "like")) {
-            List<Comment> commentList = bookDAO.getBookCommentsByLikes(bookId);
-            comments = commentList.stream().map(
-                    comment -> comment.toMap(user)
-            ).toList();
+            comments = bookDAO.getBookCommentsByLikes(bookId,pageable);
         } else {
-            List<Comment> commentList = bookDAO.getBookCommentsByTime(bookId);
-            comments = commentList.stream().map(
-                    comment -> comment.toMap(user)
-            ).toList();
+            comments = bookDAO.getBookCommentsByTime(bookId,pageable);
         }
-        int totalComments = comments.size();
-        int start = pageIndex * pageSize;
-        int end = Math.min(start + pageSize, totalComments);
-        List<Map<String, Object>> paginatedComments = comments.subList(start, end);
-        int totalPages = (int) Math.ceil((double) totalComments / pageSize);
         return Map.of(
-                "total", totalPages,
-                "items", paginatedComments
+                "total", comments.getTotalPages(),
+                "items", comments.getContent().stream().map(
+                        comment -> comment.toMap(user)
+                ).collect(Collectors.toList())
         );
     }
 

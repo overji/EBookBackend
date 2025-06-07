@@ -7,6 +7,8 @@ import com.overji.ebookbackend.serviceLayer.UserService;
 import com.overji.ebookbackend.utils.UserContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
@@ -38,14 +40,15 @@ public class UserController {
             @RequestParam int pageSize,
             HttpServletResponse response,
             HttpServletRequest request) {
-        List<User> users = userService.getAllUsers();
-        long len = (long) users.size();
-        List<User> paginatedUsers = users.stream()
-                .skip((long) pageIndex * pageSize)
-                .limit(pageSize)
-                .toList();
-        return Map.of("items",paginatedUsers.stream().map(User::toMap).toList(),
-                      "total", (long)Math.ceil((double) len / pageSize)
+        Pageable pageable = Pageable.ofSize(pageSize).withPage(pageIndex);
+        Page<User> users = userService.getAllUsers(pageable);
+        long len = users.getTotalElements(); // 使用 getTotalElements() 获取总记录数
+        List<User> paginatedUsers = users.getContent(); // 直接获取当前页的内容
+        return Map.of("items", users.getContent()
+                        .stream()
+                        .map(User::toMap)
+                        .toList(),
+                      "total", (long) Math.ceil((double) len / pageSize)
                 );
     }
 

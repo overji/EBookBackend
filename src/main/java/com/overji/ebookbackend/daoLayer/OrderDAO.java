@@ -1,20 +1,22 @@
 package com.overji.ebookbackend.daoLayer;
 
 import com.overji.ebookbackend.entityLayer.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderDAO {
-    List<Order> findByUserId(Long userId);
+    Page<Order> findByUserId(Long userId, Pageable pageable);
 
     void save(Order order);
 
     void delete(Order order);
 
-    List<Order> findByBookNameAndStartTimeAndEndTime(String bookName, LocalDateTime startTime, LocalDateTime endTime);
+    Page<Order> findByBookNameAndStartTimeAndEndTime(String bookName, LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
 
-    List<Order> findByBookNameAndStartTimeAndEndTimeAndUserId(String bookName, LocalDateTime startTime, LocalDateTime endTime, Long UserId);
+    Page<Order> findByBookNameAndStartTimeAndEndTimeAndUserId(String bookName, LocalDateTime startTime, LocalDateTime endTime, Long UserId, Pageable pageable);
 
-    List<Order> findAllOrders();
+    Page<Order> findAllOrders(Pageable pageable);
 }

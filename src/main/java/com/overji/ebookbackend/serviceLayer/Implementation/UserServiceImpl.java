@@ -5,6 +5,8 @@ import com.overji.ebookbackend.daoLayer.UserDAO;
 import com.overji.ebookbackend.entityLayer.User;
 import com.overji.ebookbackend.entityLayer.UserAuth;
 import com.overji.ebookbackend.serviceLayer.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +26,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userDAO.findAll();
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userDAO.findAll(pageable);
     }
 
     @Override

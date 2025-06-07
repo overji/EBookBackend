@@ -2,24 +2,26 @@ package com.overji.ebookbackend.daoLayer;
 
 import com.overji.ebookbackend.entityLayer.Book;
 import com.overji.ebookbackend.entityLayer.Comment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface BookDAO {
-    List<Book> findAllByTagAndTitle(String tag, String keyword);
+    Page<Book> findAllByTagAndTitle(String tag, String keyword, Pageable pageable);
+
+    Page<Book> findByTitleContaining(String keyword, Pageable pageable);
+
+    Page<Book> findByTagContaining(String tag, Pageable pageable);
 
     List<Book> findTop10Books();
 
-    List<Book> findByTitleContaining(String keyword);
+    Page<Comment> getBookCommentsByTime(Long bookId, Pageable pageable);
 
-    List<Book> findByTagContaining(String tag);
+    Page<Comment> getBookCommentsByLikes(Long bookId, Pageable pageable);
 
-    List<Comment> getBookCommentsByTime(Long bookId);
-
-    List<Comment> getBookCommentsByLikes(Long bookId);
-
-    List<Book> findAll();
+    Page<Book> findAll(Pageable pageable);
 
     Optional<Book> findById(Long id);
 

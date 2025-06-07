@@ -3,6 +3,8 @@ package com.overji.ebookbackend.serviceLayer.Implementation;
 import com.overji.ebookbackend.daoLayer.*;
 import com.overji.ebookbackend.entityLayer.*;
 import com.overji.ebookbackend.serviceLayer.OrderService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -83,38 +85,75 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Map<String, Object>> getOrdersByUserId(Long userId) {
-        List<Order> orders = orderDAO.findByUserId(userId);
-        return orders.stream().map(Order::toMap).toList();
+    public Map<String, Object> getOrdersByUserId(Long userId, int pageIndex, int pageSize) {
+        Pageable pageable = null;
+        if (pageIndex == -1 || pageSize == -1) {
+            pageable = Pageable.unpaged(); // Unpaged for all orders
+        } else {
+            pageable = Pageable.ofSize(pageSize).withPage(pageIndex);
+        }
+        Page<Order> orders = orderDAO.findByUserId(userId, pageable);
+        return Map.of(
+                "items", orders.stream().map(Order::toMap).toList(),
+                "total", orders.getTotalPages()
+        );
     }
 
     @Override
-    public List<Map<String, Object>> findByBookNameAndStartTimeAndEndTimeAndUserId(Long userId,
-                                                                                   String bookName,
-                                                                                   LocalDateTime startTime,
-                                                                                   LocalDateTime endTime
+    public Map<String, Object> findByBookNameAndStartTimeAndEndTimeAndUserId(Long userId,
+                                                                             String bookName,
+                                                                             LocalDateTime startTime,
+                                                                             LocalDateTime endTime,
+                                                                             int pageIndex,
+                                                                             int pageSize
     ) {
-        List<Order> orders = orderDAO.findByBookNameAndStartTimeAndEndTimeAndUserId(bookName, startTime, endTime, userId);
-        List<Map<String, Object>> ans;
-        ans = orders.stream().map(Order::toMap).toList();
-        return ans;
+        Pageable pageable = null;
+        if (pageIndex == -1 || pageSize == -1) {
+            pageable = Pageable.unpaged(); // Unpaged for all orders
+        } else {
+            pageable = Pageable.ofSize(pageSize).withPage(pageIndex);
+        }
+        Page<Order> orders = orderDAO.findByBookNameAndStartTimeAndEndTimeAndUserId(
+                bookName, startTime, endTime, userId, pageable);
+        return Map.of(
+                "items", orders.stream().map(Order::toMap).toList(),
+                "total", orders.getTotalPages()
+        );
     }
 
     @Override
-    public List<Map<String, Object>> findByBookNameAndStartTimeAndEndTime(String bookName,
-                                                                          LocalDateTime startTime,
-                                                                          LocalDateTime endTime
+    public Map<String, Object> findByBookNameAndStartTimeAndEndTime(String bookName,
+                                                                    LocalDateTime startTime,
+                                                                    LocalDateTime endTime,
+                                                                    int pageIndex,
+                                                                    int pageSize
     ) {
-        List<Order> orders = orderDAO.findByBookNameAndStartTimeAndEndTime(bookName, startTime, endTime);
-        List<Map<String, Object>> ans;
-        ans = orders.stream().map(Order::adminToMap).toList();
-        return ans;
+        Pageable pageable = null;
+        if (pageIndex == -1 || pageSize == -1) {
+            pageable = Pageable.unpaged(); // Unpaged for all orders
+        } else {
+            pageable = Pageable.ofSize(pageSize).withPage(pageIndex);
+        }
+        Page<Order> orders = orderDAO.findByBookNameAndStartTimeAndEndTime(bookName, startTime, endTime, pageable);
+        return Map.of(
+                "items", orders.stream().map(Order::toMap).toList(),
+                "total", orders.getTotalPages()
+        );
     }
 
     @Override
-    public List<Map<String, Object>> findAllOrders() {
-        List<Order> orders = orderDAO.findAllOrders();
-        return orders.stream().map(Order::adminToMap).toList();
+    public Map<String, Object> findAllOrders(int pageIndex, int pageSize) {
+        Pageable pageable = null;
+        if (pageIndex == -1 || pageSize == -1) {
+            pageable = Pageable.unpaged(); // Unpaged for all orders
+        } else {
+            pageable = Pageable.ofSize(pageSize).withPage(pageIndex);
+        }
+        Page<Order> orders = orderDAO.findAllOrders(pageable);
+        return Map.of(
+                "items", orders.stream().map(Order::toMap).toList(),
+                "total", orders.getTotalPages()
+        );
     }
 
     @Override
@@ -162,7 +201,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Object getUserStatistics(LocalDateTime startTime,
                                     LocalDateTime endTime) {
-        List<Order> orders = orderDAO.findByBookNameAndStartTimeAndEndTime("", startTime, endTime);
+        Pageable pageable = Pageable.unpaged(); // Unpaged for statistics
+        List<Order> orders = orderDAO.findByBookNameAndStartTimeAndEndTime("", startTime, endTime, pageable)
+                .stream()
+                .toList();
         Map<User, Long> userStatistics = new HashMap<>();
         for (Order order : orders) {
             User user = order.getUser();

@@ -1,6 +1,8 @@
 package com.overji.ebookbackend.repositoryLayer;
 
 import com.overji.ebookbackend.entityLayer.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,7 +12,7 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o WHERE o.user.id = ?1")
-    List<Order> findByUserId(Long userId);
+    Page<Order> findByUserId(Long userId, Pageable pageable);
 
     @Query("""
             SELECT o
@@ -21,10 +23,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
               AND o.createdAt > :startTime
               AND o.createdAt < :endTime
             """)
-    List<Order> findByBookNameAndStartTimeAndEndTime(
+    Page<Order> findByBookNameAndStartTimeAndEndTime(
             @Param("bookName") String bookName,
             @Param("startTime") LocalDateTime startTime,
-            @Param("endTime") LocalDateTime endTime
+            @Param("endTime") LocalDateTime endTime,
+            Pageable pageable
     );
 
     @Query("""
@@ -37,10 +40,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
               AND o.createdAt < :endTime
               AND o.user.id = :userId
             """)
-    List<Order> findByBookNameAndStartTimeAndEndTimeAndUserId(
+    Page<Order> findByBookNameAndStartTimeAndEndTimeAndUserId(
             @Param("bookName") String bookName,
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime,
-            @Param("userId") Long UserId
+            @Param("userId") Long userId,
+            Pageable pageable
     );
 }

@@ -3,6 +3,8 @@ package com.overji.ebookbackend.daoLayer.Implementation;
 import com.overji.ebookbackend.daoLayer.UserDAO;
 import com.overji.ebookbackend.entityLayer.User;
 import com.overji.ebookbackend.repositoryLayer.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,8 +19,8 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public Page<User> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     @Override
