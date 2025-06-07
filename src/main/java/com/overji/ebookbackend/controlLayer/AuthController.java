@@ -42,6 +42,15 @@ public class AuthController {
         String password = requestData.get("password");
 
         try {
+            // 使用 AuthenticationManager 进行认证
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
+
+            // 将认证信息存储到 SecurityContext
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+            securityContext.setAuthentication(authentication);
+
             // 判断是否是管理员
             User user = userService.getUserByUsername(username);
             if(user.getIsDisabled()) {
@@ -52,14 +61,6 @@ public class AuthController {
                         "isAdmin", false
                 );
             }
-            // 使用 AuthenticationManager 进行认证
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, password)
-            );
-
-            // 将认证信息存储到 SecurityContext
-            SecurityContext securityContext = SecurityContextHolder.getContext();
-            securityContext.setAuthentication(authentication);
 
             // 同步到 Session
             HttpSession session = request.getSession(true);
