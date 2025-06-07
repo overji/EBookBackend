@@ -15,13 +15,21 @@ public interface BookDAO {
 
     Page<Book> findByTagContaining(String tag, Pageable pageable);
 
+    Page<Book> findAll(Pageable pageable);
+
+    Page<Book> adminFindAllByTagAndTitle(String tag, String keyword, Pageable pageable);
+
+    Page<Book> adminFindByTitleContaining(String keyword, Pageable pageable);
+
+    Page<Book> adminFindByTagContaining(String tag, Pageable pageable);
+
+    Page<Book> adminFindAll(Pageable pageable);
+
     List<Book> findTop10Books();
 
     Page<Comment> getBookCommentsByTime(Long bookId, Pageable pageable);
 
     Page<Comment> getBookCommentsByLikes(Long bookId, Pageable pageable);
-
-    Page<Book> findAll(Pageable pageable);
 
     Optional<Book> findById(Long id);
 

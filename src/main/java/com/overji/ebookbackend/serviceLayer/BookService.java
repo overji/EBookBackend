@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface BookService {
-    Map<String, Object> getBooks(String tag, String keyword, int pageIndex, int pageSize);
+    Map<String, Object> getBooks(String tag, String keyword, int pageIndex, int pageSize, boolean isAdmin);
 
     Map<String, Object> getBookById(Long id);
 
@@ -25,4 +25,6 @@ public interface BookService {
     Map<String, Object> getBookComments(Long bookId, String orderBy, int pageIndex, int pageSize, User user);
 
     Map<String, Object> postBookComments(Long bookId, String content, User user);
+
+    Map<String,Object> setBookDeleted(Long bookId, boolean isDisabled);
 }

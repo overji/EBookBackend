@@ -30,17 +30,29 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Map<String, Object> getBooks(String tag, String keyword, int pageIndex, int pageSize) {
+    public Map<String, Object> getBooks(String tag, String keyword, int pageIndex, int pageSize, boolean isAdmin) {
         Page<Book> books = null;
         Pageable pageable = Pageable.ofSize(pageSize).withPage(pageIndex);
-        if (Objects.equals(tag, "") && Objects.equals(keyword, "")) {
-            books = bookDAO.findAll(pageable);
-        } else if (!Objects.equals(tag, "") && Objects.equals(keyword, "")) {
-            books = bookDAO.findByTagContaining(tag,pageable);
-        } else if (Objects.equals(tag, "")) {
-            books = bookDAO.findByTitleContaining(keyword,pageable);
+        if(!isAdmin){
+            if (Objects.equals(tag, "") && Objects.equals(keyword, "")) {
+                books = bookDAO.findAll(pageable);
+            } else if (!Objects.equals(tag, "") && Objects.equals(keyword, "")) {
+                books = bookDAO.findByTagContaining(tag,pageable);
+            } else if (Objects.equals(tag, "")) {
+                books = bookDAO.findByTitleContaining(keyword,pageable);
+            } else {
+                books = bookDAO.findAllByTagAndTitle(tag, keyword,pageable);
+            }
         } else {
-            books = bookDAO.findAllByTagAndTitle(tag, keyword,pageable);
+            if (Objects.equals(tag, "") && Objects.equals(keyword, "")) {
+                books = bookDAO.adminFindAll(pageable);
+            } else if (!Objects.equals(tag, "") && Objects.equals(keyword, "")) {
+                books = bookDAO.adminFindByTagContaining(tag,pageable);
+            } else if (Objects.equals(tag, "")) {
+                books = bookDAO.adminFindByTitleContaining(keyword,pageable);
+            } else {
+                books = bookDAO.adminFindAllByTagAndTitle(tag, keyword,pageable);
+            }
         }
         List<Book> paginatedBooks = books.getContent();
         int totalPages = books.getTotalPages();
@@ -55,6 +67,9 @@ public class BookServiceImpl implements BookService {
     @Override
     public Map<String, Object> getBookById(Long id) {
         Book book = bookDAO.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+        if (book.isDeleted()) {
+            throw new RuntimeException("Book not found");
+        }
         return book.toMap();
     }
 
@@ -198,6 +213,19 @@ public class BookServiceImpl implements BookService {
                 "message", "Comment posted successfully",
                 "ok", true,
                 "data", Map.of()
+        );
+    }
+
+    @Override
+    @Transactional
+    public Map<String,Object> setBookDeleted(Long bookId, boolean isDisabled){
+        Book book = bookDAO.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
+        book.setDeleted(isDisabled);
+        bookDAO.save(book);
+        return Map.of(
+                "message", "Book deletion status updated successfully",
+                "ok", true,
+                "data", book.toMap()
         );
     }
 }

@@ -23,7 +23,10 @@ public class BookTagsDAOImpl implements BookTagsDAO {
 
     @Override
     public List<BookTag> findAll() {
-        return bookTagsRepository.findAll();
+        List<BookTag> tags = bookTagsRepository.findAll();
+        return tags.stream()
+                .filter(tag -> tag.getBook() != null && tag.getBook().getId() != null)
+                .toList();
     }
 
     @Override

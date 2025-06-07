@@ -3,6 +3,7 @@ package com.overji.ebookbackend.entityLayer;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +41,9 @@ public class Book {
 
     @Column
     private Long sales = 0L;
+
+    @Column
+    private boolean isDeleted = false;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
@@ -157,19 +161,28 @@ public class Book {
         this.isbn = isbn;
     }
 
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
+
     public Map<String, Object> toMap() {
-        return Map.of(
-                "id", id,
-                "title", title,
-                "author", author,
-                "description", description,
-                "price", price,
-                "cover", cover,
-                "sales", sales,
-                "tags", tags.stream().map(BookTag::toMap).toList(),
-                "isbn", isbn,
-                "stock", stock
-        );
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", id);
+        map.put("title", title);
+        map.put("author", author);
+        map.put("description", description);
+        map.put("price", price);
+        map.put("cover", cover);
+        map.put("sales", sales);
+        map.put("tags", tags.stream().map(BookTag::toMap).toList());
+        map.put("isbn", isbn);
+        map.put("stock", stock);
+        map.put("isDeleted", isDeleted);
+        return map;
     }
 
     public Long getCommentId() {

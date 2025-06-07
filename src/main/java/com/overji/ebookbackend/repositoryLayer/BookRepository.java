@@ -11,17 +11,32 @@ import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
 
-    @Query("SELECT b FROM Book b JOIN b.tags t WHERE t.name = ?1 AND b.title LIKE %?2% ORDER BY b.id ASC")
-    Page<Book> findAllByTagAndTitle(String tag, String keyword, Pageable pageable);
-
-    @Query("SELECT b FROM Book b ORDER BY b.sales DESC LIMIT 10")
+    @Query("SELECT b FROM Book b WHERE b.isDeleted = false ORDER BY b.sales DESC LIMIT 10")
     List<Book> findTop10Books();
 
-    @Query("SELECT b FROM Book b WHERE b.title LIKE %?1%")
+    @Query("SELECT b FROM Book b JOIN b.tags t WHERE b.isDeleted = false AND t.name = ?1 AND b.title LIKE %?2% ORDER BY b.id ASC")
+    Page<Book> findAllByTagAndTitle(String tag, String keyword, Pageable pageable);
+
+    @Query("SELECT b FROM Book b WHERE b.isDeleted = false ORDER BY b.id ASC")
+    Page<Book> findAllBooks(Pageable pageable);
+
+    @Query("SELECT b FROM Book b WHERE b.title LIKE %?1% AND b.isDeleted = false")
     Page<Book> findByTitleContaining(String keyword, Pageable pageable);
 
-    @Query("SELECT b FROM Book b JOIN b.tags t WHERE t.name = ?1")
+    @Query("SELECT b FROM Book b JOIN b.tags t WHERE t.name = ?1 AND b.isDeleted = false")
     Page<Book> findByTagContaining(String tag, Pageable pageable);
+
+    @Query("SELECT b FROM Book b JOIN b.tags t WHERE t.name = ?1 AND b.title LIKE %?2% ORDER BY b.id ASC")
+    Page<Book> adminFindAllByTagAndTitle(String tag, String keyword, Pageable pageable);
+
+    @Query("SELECT b FROM Book b ORDER BY b.id ASC")
+    Page<Book> adminFindAllBooks(Pageable pageable);
+
+    @Query("SELECT b FROM Book b WHERE b.title LIKE %?1%")
+    Page<Book> adminFindByTitleContaining(String keyword, Pageable pageable);
+
+    @Query("SELECT b FROM Book b JOIN b.tags t WHERE t.name = ?1")
+    Page<Book> adminFindByTagContaining(String tag, Pageable pageable);
 
     @Query("SELECT c FROM Comment c WHERE c.book.id = ?1 ORDER BY c.createdAt DESC")
     Page<Comment> getBookCommentsByTime(Long bookId, Pageable pageable);

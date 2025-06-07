@@ -56,6 +56,8 @@ public class BookController {
         // Validate and sanitize input parameters
         tag = tag == null ? "" : tag.trim();
         keyword = keyword == null ? "" : keyword.trim();
+        UserContext.getCurrentUsername(request);
+        User currentUser = userService.getUserByUsername(UserContext.getCurrentUsername(request));
 
         if (pageIndex < 0) {
             pageIndex = 0;
@@ -63,8 +65,9 @@ public class BookController {
         if (pageSize < 1) {
             pageSize = 8;
         }
+        boolean isAdmin = currentUser != null && currentUser.getUserPrivilege() > 0;
         // get books by tag and(or) keyword
-        return bookService.getBooks(tag, keyword, pageIndex, pageSize);
+        return bookService.getBooks(tag, keyword, pageIndex, pageSize,isAdmin);
     }
 
     @GetMapping("/books/rank")
@@ -190,14 +193,15 @@ public class BookController {
     }
 
     @DeleteMapping("/book/{id}")
-    public Map<String, Object> deleteBook(
+    public Map<String, Object> setBookDeleted(
             @PathVariable Long id,
+            @RequestBody Map<String, Object> requestData,
             HttpServletResponse response,
             HttpServletRequest request
     ) {
-
+        boolean isDeleted = requestData.get("isDeleted") != null && (Boolean) requestData.get("isDeleted");
         // delete book by id
-        bookService.deleteBook(id);
+        bookService.setBookDeleted(id, isDeleted);
         return Map.of(
                 "status", 200,
                 "message", "ok",

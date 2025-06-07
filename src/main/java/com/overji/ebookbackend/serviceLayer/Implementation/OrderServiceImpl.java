@@ -62,6 +62,14 @@ public class OrderServiceImpl implements OrderService {
                         "data", Map.of()
                 );
             }
+            if(book.isDeleted()) {
+                orderDAO.delete(order);
+                return Map.of(
+                        "message", "书籍已被下架",
+                        "ok", false,
+                        "data", Map.of()
+                );
+            }
             OrderItem orderItem = new OrderItem();
             orderItem.setBook(book);
             orderItem.setNumber(cart.getNumber());
@@ -170,6 +178,13 @@ public class OrderServiceImpl implements OrderService {
         if (book.getStock() < number) {
             return Map.of(
                     "message", "库存不足",
+                    "ok", false,
+                    "data", Map.of()
+            );
+        }
+        if (book.isDeleted()) {
+            return Map.of(
+                    "message", "书籍已被下架",
                     "ok", false,
                     "data", Map.of()
             );

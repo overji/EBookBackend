@@ -36,7 +36,7 @@ public class BookDAOImpl implements BookDAO {
 
     @Override
     public Page<Book> findAll(Pageable pageable) {
-        return bookRepository.findAll(pageable);
+        return bookRepository.findAllBooks(pageable);
     }
 
     @Override
@@ -67,5 +67,25 @@ public class BookDAOImpl implements BookDAO {
     @Override
     public void deleteById(Long id) { // 实现 deleteById 方法
         bookRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<Book> adminFindAllByTagAndTitle(String tag, String keyword, Pageable pageable) {
+        return bookRepository.adminFindAllByTagAndTitle(tag, keyword, pageable);
+    }
+
+    @Override
+    public Page<Book> adminFindByTitleContaining(String keyword, Pageable pageable) {
+        return bookRepository.adminFindByTitleContaining(keyword, pageable);
+    }
+
+    @Override
+    public Page<Book> adminFindByTagContaining(String tag, Pageable pageable) {
+        return bookRepository.adminFindByTagContaining(tag, pageable);
+    }
+
+    @Override
+    public Page<Book> adminFindAll(Pageable pageable) {
+        return bookRepository.adminFindAllBooks(pageable);
     }
 }
