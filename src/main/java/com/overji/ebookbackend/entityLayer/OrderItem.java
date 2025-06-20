@@ -22,6 +22,9 @@ public class OrderItem {
     @Column(nullable = false)
     private Long number = 0L;
 
+    @Column(nullable = false)
+    private Long cost = 0L;
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -54,10 +57,19 @@ public class OrderItem {
         return number;
     }
 
+    public void setCost(Long cost) {
+        this.cost = cost;
+    }
+
+    public Long getCost() {
+        return cost;
+    }
+
     public Map<String, Object> toMap() {
         return Map.of(
                 "id", id,
                 "book", book.toMap(),
+                "cost", cost,
                 "number", number
         );
     }

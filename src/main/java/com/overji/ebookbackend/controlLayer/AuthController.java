@@ -51,7 +51,7 @@ public class AuthController {
             SecurityContext securityContext = SecurityContextHolder.getContext();
             securityContext.setAuthentication(authentication);
 
-            // 判断是否是管理员
+            // 判断是否是
             User user = userService.getUserByUsername(username);
             if(user.getIsDisabled()) {
                 return Map.of(

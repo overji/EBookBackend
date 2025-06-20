@@ -74,6 +74,7 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setBook(book);
             orderItem.setNumber(cart.getNumber());
             orderItem.setOrder(order);
+            orderItem.setCost(book.getPrice() * cart.getNumber());
             order.addItem(orderItem);
             orderItemDAO.save(orderItem);
             book.setSales(book.getSales() + cart.getNumber());
@@ -199,6 +200,7 @@ public class OrderServiceImpl implements OrderService {
         orderItem.setBook(book);
         orderItem.setNumber(number);
         orderItem.setOrder(order);
+        orderItem.setCost(book.getPrice() * number);
         order.addItem(orderItem);
         orderItemDAO.save(orderItem);
         book.setSales(book.getSales() + number);
@@ -225,7 +227,7 @@ public class OrderServiceImpl implements OrderService {
             User user = order.getUser();
             Long totalMoney = userStatistics.getOrDefault(user, 0L);
             totalMoney += order.getItems().stream()
-                    .mapToLong(item -> item.getBook().getPrice() * item.getNumber())
+                    .mapToLong(OrderItem::getCost)
                     .sum();
             userStatistics.put(user, totalMoney);
         }
