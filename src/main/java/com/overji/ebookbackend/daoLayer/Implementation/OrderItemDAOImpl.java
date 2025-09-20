@@ -17,4 +17,9 @@ public class OrderItemDAOImpl implements OrderItemDAO {
     public void save(OrderItem orderItem) {
         orderItemRepository.save(orderItem);
     }
+
+    @Override
+    public void delete(OrderItem item) {
+        orderItemRepository.delete(item);
+    }
 }

@@ -1,6 +1,7 @@
 package com.overji.ebookbackend.controlLayer;
 
 import com.overji.ebookbackend.entityLayer.User;
+import com.overji.ebookbackend.serviceLayer.TimerRecordService;
 import com.overji.ebookbackend.serviceLayer.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -8,6 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,13 +30,16 @@ import static org.springframework.security.web.context.HttpSessionSecurityContex
 
 @RestController
 @RequestMapping("/api")
+@Scope(value = "singleton")
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
+    private final TimerRecordService timerRecordService;
 
-    public AuthController(AuthenticationManager authenticationManager, UserService userService) {
+    public AuthController(AuthenticationManager authenticationManager, UserService userService, TimerRecordService timerRecordService) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
+        this.timerRecordService = timerRecordService;
     }
 
     @PostMapping("/login")
@@ -69,6 +75,8 @@ public class AuthController {
             boolean isAdmin = user.getUserPrivilege() == 1;
             session.setAttribute("isAdmin", isAdmin);
 
+            timerRecordService.startTimer();
+
             return Map.of(
                     "message", "ok",
                     "ok", true,
@@ -88,14 +96,15 @@ public class AuthController {
 
     @PutMapping("/logout")
     public Map<String, Object> logout(HttpServletRequest request) {
-        // 清除 Session
+        int duration = timerRecordService.endTimer();
         request.getSession().invalidate();
 
         // 设置登出成功后的响应
         return Map.of(
                 "message", "ok",
                 "ok", true,
-                "data", Map.of()
+                "data", Map.of(),
+                "logout_time", duration
         );
     }
 }
