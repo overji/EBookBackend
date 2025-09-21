@@ -1,10 +1,12 @@
 package com.overji.ebookbackend.controlLayer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.overji.ebookbackend.entityLayer.*;
 import com.overji.ebookbackend.utils.UserContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.websocket.server.PathParam;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 import com.overji.ebookbackend.serviceLayer.*;
 
@@ -26,11 +28,13 @@ public class OrderController {
     private final OrderService orderService;
     private final UserService userService;
     private final BookService bookService;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public OrderController(OrderService orderService, UserService userService, BookService bookService) {
+    public OrderController(OrderService orderService, UserService userService, BookService bookService, KafkaTemplate<String, String> kafkaTemplate) {
         this.orderService = orderService;
         this.userService = userService;
         this.bookService = bookService;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     @GetMapping("")
@@ -157,11 +161,29 @@ public class OrderController {
         try {
             // add one order by book id
             String username = UserContext.getCurrentUsername(request);
-            User user = userService.getUserByUsername(username);
             String address = body.get("address").toString();
             String tel = body.get("tel").toString();
             String receiver = body.get("receiver").toString();
-            return orderService.addOneOrder(address, tel, receiver, bookId, number, user);
+            User user = userService.getUserByUsername(username);
+            Map<String, Object> orderRequest = Map.of(
+                    "type", "direct-purchase",
+                    "address", address,
+                    "tel", tel,
+                    "receiver", receiver,
+                    "bookId", bookId,
+                    "number", number,
+                    "username", username
+            );
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonMessage = objectMapper.writeValueAsString(orderRequest);
+            kafkaTemplate.send("ebook-topic", jsonMessage);
+            System.out.println("Kafka sent direct-purchase from username: " + username + ", bookId: " + bookId + ", number: " + number);
+            System.out.println("Kafka sent message: " + jsonMessage);
+            return Map.of(
+                    "message", "Order placed successfully",
+                    "ok", true,
+                    "data", Map.of()
+            );
         } catch (Exception e) {
             response.setStatus(400);
             return Map.of(
@@ -190,7 +212,24 @@ public class OrderController {
                     .stream()
                     .map(Integer::longValue)
                     .toList();
-            return orderService.addOrder(address, tel, receiver, itemIds, user);
+            Map<String, Object> orderRequest = Map.of(
+                    "type", "cart-purchase",
+                    "address", address,
+                    "tel", tel,
+                    "receiver", receiver,
+                    "itemIds", itemIds,
+                    "username", username
+            );
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonMessage = objectMapper.writeValueAsString(orderRequest);
+            kafkaTemplate.send("ebook-topic", jsonMessage);
+            System.out.println("Kafka sent cart-purchase from username: " + username + ", itemIds: " + itemIds);
+            System.out.println("Kafka sent message: " + jsonMessage);
+            return Map.of(
+                    "message", "Order placed successfully",
+                    "ok", true,
+                    "data", Map.of()
+            );
         } catch (Exception e) {
             response.setStatus(400);
             return Map.of(

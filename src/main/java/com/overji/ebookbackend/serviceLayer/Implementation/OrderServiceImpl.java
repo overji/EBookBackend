@@ -3,6 +3,7 @@ package com.overji.ebookbackend.serviceLayer.Implementation;
 import com.overji.ebookbackend.daoLayer.*;
 import com.overji.ebookbackend.entityLayer.*;
 import com.overji.ebookbackend.serviceLayer.OrderService;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
@@ -31,6 +32,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public Map<String, Object> addOrder(String address, String tel, String receiver, List<Long> itemIds, User user) {
         Long totalMoney = 0L;
         for (Long itemId : itemIds) {
@@ -166,6 +168,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public Map<String, Object> addOneOrder(String address, String tel, String receiver, Long bookId, Long number, User user) {
         Book book = bookDAO.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
         Long totalMoney = book.getPrice() * number;
